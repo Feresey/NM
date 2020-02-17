@@ -1,6 +1,6 @@
-package matrix
+package core
 
-// Matrix : type for process matrix actions
+// Matrix : type for process core actions
 type Matrix struct {
 	data []float64
 	// Number lines
