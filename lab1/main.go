@@ -14,18 +14,17 @@ import (
  * a21 a22 ...
  * ...     ann
  */
-func readMatrix() (*core.Matrix, error) {
+func readMatrix() *core.Matrix {
 	var (
 		n int
 		m int
 	)
 
-	fmt.Println("Введите матрицу:")
-	fmt.Print("N, M:")
+	fmt.Print("Введите матрицу:\nN, M: ")
 
 	_, err := fmt.Scanf("%d %d", &n, &m)
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
 
 	res := core.NewMatrix(n, m)
@@ -35,20 +34,18 @@ func readMatrix() (*core.Matrix, error) {
 			var num float64
 			_, err := fmt.Scan(&num)
 			if err != nil {
-				return nil, err
+				log.Fatal(err)
+
 			}
 			res.Set(i, j, num)
 		}
 	}
 
-	return res, nil
+	return res
 }
 
 func main() {
-	m, err := readMatrix()
-	if err != nil {
-		log.Fatal(err)
-	}
+	m := readMatrix()
 
 	L, U, P, err := m.LUDecomposition()
 	if err != nil {
