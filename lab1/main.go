@@ -3,9 +3,7 @@ package main
 import (
 	"NM/core"
 	"fmt"
-	"io"
 	"log"
-	"os"
 )
 
 // readMatrix : читает матрицу.
@@ -16,13 +14,16 @@ import (
  * a21 a22 ...
  * ...     ann
  */
-func readMatrix(r io.Reader) (*core.Matrix, error) {
+func readMatrix() (*core.Matrix, error) {
 	var (
 		n int
 		m int
 	)
 
-	_, err := fmt.Fscanf(r, "%d %d", &n, &m)
+	fmt.Println("Введите матрицу:")
+	fmt.Print("N, M:")
+
+	_, err := fmt.Scanf("%d %d", &n, &m)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +33,7 @@ func readMatrix(r io.Reader) (*core.Matrix, error) {
 	for i := 0; i < n; i++ {
 		for j := 0; j < m; j++ {
 			var num float64
-			_, err := fmt.Fscan(r, &num)
+			_, err := fmt.Scan(&num)
 			if err != nil {
 				return nil, err
 			}
@@ -44,9 +45,7 @@ func readMatrix(r io.Reader) (*core.Matrix, error) {
 }
 
 func main() {
-	fmt.Printf("Введите матрицу:\n")
-
-	m, err := readMatrix(os.Stdin)
+	m, err := readMatrix()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -57,4 +56,15 @@ func main() {
 	}
 
 	fmt.Printf("L:\n%s\nU:\n%s\nP:\n%s\n", L, U, P)
+
+	LU, err := L.ProdMatrix(U)
+	if err != nil {
+		log.Fatal(err)
+	}
+	LUP, err := LU.ProdMatrix(P)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("L*U*P:\n%s\n", LUP)
 }

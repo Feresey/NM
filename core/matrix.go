@@ -98,14 +98,17 @@ func (matrix *Matrix) SwapLines(a, b int) {
 }
 
 func (matrix *Matrix) findNotZeroIndexInCol(idx int, P *Matrix) error {
-	line := idx * matrix.m
+	line := idx + matrix.m*idx
 
 	for i := idx; i < matrix.n; i++ {
-		if matrix.data[line+i] != 0 {
+		if matrix.data[line] != 0 {
 			matrix.SwapLines(idx, i)
-			P.SwapLines(idx, i)
+			if P != nil {
+				P.SwapLines(idx, i)
+			}
 			return nil
 		}
+		line += matrix.m
 	}
 
 	return errors.New("Вырожденная матрица")
