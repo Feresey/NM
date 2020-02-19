@@ -1,4 +1,8 @@
 .PHONY: all debug
 
 all:
-	go build -v
+	@mkdir -p ./build/
+	go build -v -o ./build/
+
+clean:
+	rm -rf ./build/
