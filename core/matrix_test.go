@@ -137,6 +137,7 @@ func TestMatrix_ProdMatrix(t *testing.T) {
 			got, err := core.ProdMatrix(&tt.arg)
 			if (err != nil) != tt.wantErr {
 				t.Error(err)
+				return
 			}
 
 			if !tt.wantErr && !reflect.DeepEqual(*got, tt.want) {
@@ -146,6 +147,9 @@ func TestMatrix_ProdMatrix(t *testing.T) {
 	}
 
 	if tests[0].arg.String() == "" {
+		t.Error("oops")
+	}
+	if n, m := tests[0].arg.GetSize(); n == 0 || m == 0 {
 		t.Error("oops")
 	}
 }
@@ -294,6 +298,18 @@ func TestMatrix_LUDecomposition(t *testing.T) {
 			P: EMatrix(2),
 		},
 		{
+			name: "simple solve",
+			Matrix: Matrix{
+				data: []float64{
+					1, 0, 1,
+					0, 1, 2,
+				},
+				n: 2,
+				m: 3,
+			},
+			wantErr: true,
+		},
+		{
 			name: "zero coloumn",
 			Matrix: Matrix{
 				data: []float64{
@@ -319,36 +335,25 @@ func TestMatrix_LUDecomposition(t *testing.T) {
 			},
 			wantErr: true,
 		},
-		{
-			name: "not square",
-			Matrix: Matrix{
-				data: []float64{
-					1, 2, 3,
-					4, 5, 6,
-				},
-				n: 2,
-				m: 3,
-			},
-			wantErr: true,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			L, U, P, err := tt.Matrix.LUDecomposition()
 			if (err != nil) != tt.wantErr {
 				t.Error(err)
+				return
 			}
 			if tt.wantErr {
 				return
 			}
 			if !reflect.DeepEqual(L, tt.L) {
-				t.Errorf("Given:\n%s\nWant:\n%s", L, tt.L)
+				t.Errorf("L Given:\n%s\nWant:\n%s", L, tt.L)
 			}
 			if !reflect.DeepEqual(U, tt.U) {
-				t.Errorf("Given:\n%s\nWant:\n%s", U, tt.U)
+				t.Errorf("U Given:\n%s\nWant:\n%s", U, tt.U)
 			}
 			if !reflect.DeepEqual(P, tt.P) {
-				t.Errorf("Given:\n%s\nWant:\n%s", P, tt.P)
+				t.Errorf("P Given:\n%s\nWant:\n%s", P, tt.P)
 			}
 		})
 	}
@@ -409,6 +414,7 @@ func TestMatrix_findNotZeroIndexInCol(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := tt.Matrix.findNotZeroIndexInCol(tt.args.idx, tt.args.P); (err != nil) != tt.wantErr {
 				t.Error(err)
+				return
 			}
 			if !tt.wantErr && !reflect.DeepEqual(tt.Matrix, tt.want) {
 				t.Errorf("Given:\n%s\nWant:\n%s", tt.Matrix, tt.want)
@@ -504,6 +510,93 @@ func TestMatrix_Set(t *testing.T) {
 			tt.Matrix.Set(tt.args.i, tt.args.j, tt.args.value)
 			if !reflect.DeepEqual(tt.Matrix, tt.want) {
 				t.Errorf("Given:\n%s\nWant:\n%s", tt.Matrix, tt.want)
+			}
+		})
+	}
+}
+
+func TestSolveSLAU(t *testing.T) {
+	type args struct {
+		matrix *Matrix
+		b      []float64
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    []float64
+		wantErr bool
+	}{
+		{
+			name: "simple",
+			args: args{
+				matrix: &Matrix{
+					data: []float64{
+						1, 0,
+						0, 1,
+					},
+					n: 2,
+					m: 2,
+				},
+				b: []float64{3, 1},
+			},
+			want: []float64{3, 1},
+		},
+		{
+			name: "simple rotated",
+			args: args{
+				matrix: &Matrix{
+					data: []float64{
+						0, 1,
+						1, 0,
+					},
+					n: 2,
+					m: 2,
+				},
+				b: []float64{3, 1},
+			},
+			want: []float64{1, 3},
+		},
+		{
+			name: "hard",
+			args: args{
+				matrix: &Matrix{
+					data: []float64{
+						1, 2,
+						3, -1,
+					},
+					n: 2,
+					m: 2,
+				},
+				b: []float64{11, 12},
+			},
+			want: []float64{5, 3},
+		},
+		{
+			name: "harder",
+			args: args{
+				matrix: &Matrix{
+					data: []float64{
+						1, -2, 1,
+						2, 2, -1,
+						4, -1, 1,
+					},
+					n: 3,
+					m: 3,
+				},
+				b: []float64{0, 3, 5},
+			},
+			want: []float64{1, 2, 3},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := SolveSLAU(tt.args.matrix, tt.args.b)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("SolveSLAU() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("SolveSLAU() = %v, want %v", got, tt.want)
 			}
 		})
 	}

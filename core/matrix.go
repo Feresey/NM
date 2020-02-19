@@ -28,11 +28,16 @@ func (matrix *Matrix) Copy() *Matrix {
 	return res
 }
 
+// GetSize : return sizes
+func (matrix *Matrix) GetSize() (rows, coloumns int) {
+	return matrix.n, matrix.m
+}
+
 func (matrix Matrix) String() string {
 	b := strings.Builder{}
 
-	for i := 0; i < matrix.m; i++ {
-		for j := 0; j < matrix.n; j++ {
+	for i := 0; i < matrix.n; i++ {
+		for j := 0; j < matrix.m; j++ {
 			b.WriteString(fmt.Sprintf("%f ", matrix.data[i*matrix.m+j]))
 		}
 		b.WriteString("\n")
@@ -122,7 +127,6 @@ func (matrix *Matrix) LUDecomposition() (*Matrix, *Matrix, *Matrix, error) {
 	if matrix.n != matrix.m {
 		return nil, nil, nil, errors.New("Матрица не квадратная")
 	}
-
 	var (
 		U = matrix.Copy()
 		L = EMatrix(U.n)
@@ -155,4 +159,38 @@ func (matrix *Matrix) LUDecomposition() (*Matrix, *Matrix, *Matrix, error) {
 	}
 
 	return L, U, P, nil
+}
+
+func SolveSLAU(matrix *Matrix, b []float64) ([]float64, error) {
+	L, U, P, err := matrix.LUDecomposition()
+	if err != nil {
+		return nil, err
+	}
+	var (
+		x = make([]float64, matrix.n)
+		y = make([]float64, matrix.n)
+	)
+
+	for i := 0; i < matrix.n; i++ {
+		var num float64
+		for j := 0; j < i; j++ {
+			num += L.Get(i, j) * y[j]
+		}
+		y[i] = b[i] - num
+	}
+
+	for last := matrix.n - 1; last >= 0; last-- {
+		var num float64
+		for j := last + 1; j < matrix.n; j++ {
+			num += U.Get(last, j) * x[j]
+		}
+		x[last] = (y[last] - num) / U.Get(last, last)
+	}
+
+	res, err := P.ProdMatrix(&Matrix{data: x, n: matrix.n, m: 1})
+	if err != nil {
+		return nil, err
+	}
+
+	return res.data, nil
 }
