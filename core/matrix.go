@@ -124,7 +124,7 @@ func (matrix *Matrix) findNotZeroIndexInCol(idx int, P *Matrix) error {
 // U - верхнетреугольная
 // P - матрица перестановок (опциональная)
 func (matrix *Matrix) LUDecomposition() (*Matrix, *Matrix, *Matrix, error) {
-	if matrix.n != matrix.m {
+	if matrix == nil || matrix.n != matrix.m {
 		return nil, nil, nil, errors.New("Матрица не квадратная")
 	}
 	var (
@@ -172,25 +172,28 @@ func SolveSLAU(matrix *Matrix, b []float64) ([]float64, error) {
 	)
 
 	for i := 0; i < matrix.n; i++ {
-		var num float64
+		var (
+			num  float64
+			line = i * L.m
+		)
 		for j := 0; j < i; j++ {
-			num += L.Get(i, j) * y[j]
+			num += L.data[line+j] * y[j]
 		}
 		y[i] = b[i] - num
 	}
 
-	for last := matrix.n - 1; last >= 0; last-- {
-		var num float64
-		for j := last + 1; j < matrix.n; j++ {
-			num += U.Get(last, j) * x[j]
+	for i := matrix.n - 1; i >= 0; i-- {
+		var (
+			num  float64
+			line = i * U.m
+		)
+		for j := i + 1; j < matrix.n; j++ {
+			num += U.data[line+j] * x[j]
 		}
-		x[last] = (y[last] - num) / U.Get(last, last)
+		x[i] = (y[i] - num) / U.Get(i, i)
 	}
 
-	res, err := P.ProdMatrix(&Matrix{data: x, n: matrix.n, m: 1})
-	if err != nil {
-		return nil, err
-	}
+	res, _ := P.ProdMatrix(&Matrix{data: x, n: matrix.n, m: 1})
 
 	return res.data, nil
 }
