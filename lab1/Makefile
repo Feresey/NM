@@ -9,4 +9,4 @@ clean:
 	@rm -vrf ./build/
 
 test: $(TESTS)
-	$(foreach test,$^, ./build/lab1 < $(test) && sleep 1;)
+	$(foreach test,$^, ./build/lab1 < $(test) && sleep 1; echo ;)

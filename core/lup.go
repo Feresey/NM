@@ -11,10 +11,6 @@ import (
 // U - верхнетреугольная
 // P - матрица перестановок (опциональная)
 func LUDecomposition(matrix *Matrix) *LUP {
-	if matrix == nil || matrix.n != matrix.m {
-		return nil
-	}
-
 	var (
 		L = NewMatrix(matrix.n, matrix.m)
 		U = matrix.Copy()
@@ -100,7 +96,21 @@ func (lup *LUP) Determinant() float64 {
 }
 
 func (lup *LUP) Inverse() *Matrix {
-	return nil
+	res := NewMatrix(lup.n, lup.m)
+
+	for i := 0; i < lup.m; i++ {
+		col := make(Row, lup.n)
+		col[i] = 1
+		resCol := lup.SolveSLAU(col)
+
+		line := i
+		for _, val := range resCol {
+			res.data[line] = val
+			line += lup.m
+		}
+	}
+
+	return res
 }
 
 func (d DisplaySLAU) String() string {
@@ -108,10 +118,12 @@ func (d DisplaySLAU) String() string {
 
 	for i := 0; i < d.n; i++ {
 		line := i * d.m
-		for j := 0; j < d.m; j++ {
-			b.WriteString(fmt.Sprintf("%6.2f*x%d ", d.data[line+j], j+1))
+		b.WriteString(fmt.Sprintf("%6.2f*x%d", d.data[line], 1))
+
+		for j := 1; j < d.m; j++ {
+			b.WriteString(fmt.Sprintf(" +%6.2f*x%d", d.data[line+j], j+1))
 		}
-		b.WriteString(fmt.Sprintf(" = %f\n", d.Row[i]))
+		b.WriteString(fmt.Sprintf(" = %6.2f\n", d.Row[i]))
 	}
 
 	return b.String()
