@@ -1,8 +1,8 @@
 package core
 
 import (
-	"errors"
 	"fmt"
+	"math"
 	"strings"
 )
 
@@ -10,9 +10,9 @@ import (
 // L - нижнетреугольную с еденицами на главной диогонали
 // U - верхнетреугольная
 // P - матрица перестановок (опциональная)
-func LUDecomposition(matrix *Matrix) (*LUP, error) {
+func LUDecomposition(matrix *Matrix) *LUP {
 	if matrix == nil || matrix.n != matrix.m {
-		return nil, errors.New("Матрица не квадратная")
+		return nil
 	}
 
 	var (
@@ -50,14 +50,14 @@ func LUDecomposition(matrix *Matrix) (*LUP, error) {
 		L.data[line] = 1
 	}
 
-	return &LUP{l: L, u: U, p: P, n: matrix.n, m: matrix.m}, nil
+	return &LUP{L: L, U: U, P: P, n: matrix.n, m: matrix.m}
 }
 
-func (lup *LUP) SolveSLAU(b Row) (Row, error) {
+func (lup *LUP) SolveSLAU(b Row) Row {
 	if len(b) != lup.n {
-		return nil, errors.New("Неверная размерность столбца")
+		return nil
 	}
-	tmp, _ := lup.p.ProdMatrix(&Matrix{data: b, n: lup.n, m: 1})
+	tmp := lup.P.ProdMatrix(&Matrix{data: b, n: lup.n, m: 1})
 	b = tmp.data
 	var (
 		x = make(Row, lup.n)
@@ -70,7 +70,7 @@ func (lup *LUP) SolveSLAU(b Row) (Row, error) {
 			line = i * lup.m
 		)
 		for j := 0; j < i; j++ {
-			num += lup.l.data[line+j] * y[j]
+			num += lup.L.data[line+j] * y[j]
 		}
 		y[i] = b[i] - num
 	}
@@ -81,22 +81,26 @@ func (lup *LUP) SolveSLAU(b Row) (Row, error) {
 			line = i * lup.m
 		)
 		for j := i + 1; j < lup.n; j++ {
-			num += lup.u.data[line+j] * x[j]
+			num += lup.U.data[line+j] * x[j]
 		}
-		x[i] = (y[i] - num) / lup.u.Get(i, i)
+		x[i] = (y[i] - num) / lup.U.Get(i, i)
 	}
 
-	return x, nil
+	return x
 }
 
 func (lup *LUP) Determinant() float64 {
 	lineIter := 0
 	var res float64 = 1
-	for lineIter < len(lup.u.data) {
-		res *= lup.u.data[lineIter]
+	for lineIter < len(lup.U.data) {
+		res *= lup.U.data[lineIter]
 		lineIter += lup.m + 1
 	}
-	return res
+	return math.Abs(res)
+}
+
+func (lup *LUP) Inverse() *Matrix {
+	return nil
 }
 
 func (d DisplaySLAU) String() string {

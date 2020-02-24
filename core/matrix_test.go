@@ -142,11 +142,7 @@ func TestMatrix_ProdMatrix(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.Matrix.ProdMatrix(&tt.arg)
-			if (err != nil) != tt.wantErr {
-				t.Error(err)
-				return
-			}
+			got := tt.Matrix.ProdMatrix(&tt.arg)
 
 			if !tt.wantErr && !matrixEqual(got, &tt.want) {
 				t.Errorf("Given:\n%s\nWant:\n%s", got, tt.want)

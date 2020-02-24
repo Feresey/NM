@@ -71,19 +71,30 @@ func TestMatrix_LUDecomposition(t *testing.T) {
 				m: 3,
 			},
 		},
+		{
+			name: "zero",
+			Matrix: Matrix{
+				data: Row{
+					0, 0, 0,
+					0, 0, 0,
+					0, 0, 0,
+				},
+				n: 3,
+				m: 3,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			lup, err := LUDecomposition(&tt.Matrix)
-			if (err != nil) != tt.wantErr {
-				t.Error(err)
+			lup := LUDecomposition(&tt.Matrix)
+			if (lup == nil) != tt.wantErr {
+				t.Error("Matrix is nil")
 				return
 			}
 			if tt.wantErr {
 				return
 			}
-			lu, _ := lup.l.ProdMatrix(lup.u)
-			got, _ := lu.ProdMatrix(lup.p)
+			got := lup.L.ProdMatrix(lup.U).ProdMatrix(lup.P)
 
 			if !matrixEqual(got, &tt.Matrix) {
 				t.Errorf("L Given:\n%s\nWant:\n%s", got, tt.Matrix)
@@ -124,6 +135,21 @@ func TestSolveSLAU(t *testing.T) {
 		{
 			name:     "nil",
 			wantErr1: true,
+		},
+		{
+			name: "zero",
+			args: args{
+				matrix: &Matrix{
+					data: Row{
+						0, 0, 0,
+						0, 0, 0,
+						0, 0, 0,
+					},
+					n: 3,
+					m: 3,
+				},
+				b: Row{10, 0, -10},
+			},
 		},
 		{
 			name: "not square_1",
@@ -261,17 +287,17 @@ func TestSolveSLAU(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			lup, err := LUDecomposition(tt.args.matrix)
-			if (err != nil) != tt.wantErr1 {
-				t.Errorf("LUDecomposition() error = %v, wantErr %v", err, tt.wantErr1)
+			lup := LUDecomposition(tt.args.matrix)
+			if (lup == nil) != tt.wantErr1 {
+				t.Errorf("LUDecomposition() wantErr %v", tt.wantErr1)
 				return
 			}
 			if tt.wantErr1 {
 				return
 			}
-			got, err := lup.SolveSLAU(tt.args.b)
-			if (err != nil) != tt.wantErr2 {
-				t.Errorf("SolveSLAU() error = %v, wantErr %v", err, tt.wantErr2)
+			got := lup.SolveSLAU(tt.args.b)
+			if (got == nil) != tt.wantErr2 {
+				t.Errorf("SolveSLAU() wantErr %v", tt.wantErr2)
 				return
 			}
 			if tt.wantErr2 {

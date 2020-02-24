@@ -1,7 +1,6 @@
 package core
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 )
@@ -62,9 +61,9 @@ func EMatrix(n int) *Matrix {
 }
 
 // ProdMatrix : перемножает матрицы
-func (matrix *Matrix) ProdMatrix(right *Matrix) (*Matrix, error) {
+func (matrix *Matrix) ProdMatrix(right *Matrix) *Matrix {
 	if matrix.m != right.n {
-		return nil, errors.New("Не совпадают размерности матриц")
+		return nil
 	}
 	res := NewMatrix(matrix.n, right.m)
 
@@ -82,7 +81,7 @@ func (matrix *Matrix) ProdMatrix(right *Matrix) (*Matrix, error) {
 		}
 	}
 
-	return res, nil
+	return res
 }
 
 // SwapLines : swap lines a and b

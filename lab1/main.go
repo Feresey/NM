@@ -31,8 +31,7 @@ func readSLAU(n int) (*core.Matrix, core.Row) {
 
 /*
 	Формат:
-	<rows> <coloumns>
-
+	n
 	a11 a12 ... b1
 	a21 a22 ... b2
 	... ... ... ...
@@ -45,16 +44,18 @@ func main() {
 	fmt.Println("Введите элементы матрицы:")
 	matrix, b := readSLAU(n)
 
-	lup, err := core.LUDecomposition(matrix)
-	if err != nil {
-		log.Fatal(err)
+	lup := core.LUDecomposition(matrix)
+	if lup == nil {
+		log.Fatal("Матрица пустая")
 	}
 
 	fmt.Printf("%s\nDet(A) = %f\n", core.DisplaySLAU{Matrix: matrix, Row: b}, lup.Determinant())
+	fmt.Printf("L:\n%s\nU:\n%s\nP:\n%s\n", lup.L, lup.U, lup.P)
+	// fmt.Printf("L*U*P:\n%s\n", lup.L.ProdMatrix(lup.U).ProdMatrix(lup.P))
 
-	x, err := lup.SolveSLAU(b)
-	if err != nil {
-		log.Fatal(err)
+	x := lup.SolveSLAU(b)
+	if x == nil {
+		log.Fatal("Матрица пустая")
 	}
 
 	for idx := range x {

@@ -25,7 +25,7 @@ type DisplaySLAU struct {
 }
 
 type LUP struct {
-	l, u, p *Matrix
+	L, U, P *Matrix
 
 	n, m int
 }
