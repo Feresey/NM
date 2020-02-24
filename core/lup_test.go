@@ -112,7 +112,6 @@ func TestSolveSLAU(t *testing.T) {
 	tests := []struct {
 		name               string
 		args               args
-		want               Row
 		wantErr1, wantErr2 bool
 	}{
 		{
@@ -121,7 +120,6 @@ func TestSolveSLAU(t *testing.T) {
 				matrix: NewMatrix(0, 0),
 				b:      Row{},
 			},
-			want: Row{},
 		},
 		{
 			name:     "nil",
@@ -168,7 +166,6 @@ func TestSolveSLAU(t *testing.T) {
 				},
 				b: Row{3, 1},
 			},
-			want: Row{3, 1},
 		},
 		{
 			name: "simple rotated",
@@ -183,7 +180,6 @@ func TestSolveSLAU(t *testing.T) {
 				},
 				b: Row{3, 1},
 			},
-			want: Row{1, 3},
 		},
 		{
 			name: "hard",
@@ -198,7 +194,6 @@ func TestSolveSLAU(t *testing.T) {
 				},
 				b: Row{11, 12},
 			},
-			want: Row{5, 3},
 		},
 		{
 			name: "harder",
@@ -214,7 +209,6 @@ func TestSolveSLAU(t *testing.T) {
 				},
 				b: Row{0, 3, 5},
 			},
-			want: Row{1, 2, 3},
 		},
 		{
 			name: "big",
@@ -231,7 +225,6 @@ func TestSolveSLAU(t *testing.T) {
 				},
 				b: Row{-60, -10, 65, 18},
 			},
-			want: Row{7, 6, -6, -1},
 		},
 		{
 			name: "also big",
@@ -248,7 +241,22 @@ func TestSolveSLAU(t *testing.T) {
 				},
 				b: Row{24, 41, 0, 20},
 			},
-			want: Row{0, 0, 0, 0},
+		},
+		{
+			name: "fuck",
+			args: args{
+				matrix: &Matrix{
+					data: Row{
+						-1, -3, 0, -4,
+						3, 7, -8, 3,
+						1, -6, 2, 5,
+						-8, -4, -1, -1,
+					},
+					n: 4,
+					m: 4,
+				},
+				b: Row{-3, 30, -90, 12},
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -271,7 +279,7 @@ func TestSolveSLAU(t *testing.T) {
 			}
 			for i := 0; i < lup.n; i++ {
 				if tmp := sumRow(tt.args.matrix, got, i); math.Abs(tmp-tt.args.b[i]) > EPS {
-					t.Errorf("incorrect answer. got: %v, want: %v, but sum of %d is %f, expected %f", got, tt.want, i, tmp, -tt.args.b[i])
+					t.Errorf("incorrect answer. got: %v, but sum of %d is %f, expected %f", got, i, tmp, -tt.args.b[i])
 				}
 			}
 		})
