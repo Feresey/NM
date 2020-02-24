@@ -38,7 +38,7 @@ func (matrix Matrix) String() string {
 
 	for i := 0; i < matrix.n; i++ {
 		for j := 0; j < matrix.m; j++ {
-			b.WriteString(fmt.Sprintf("%f ", matrix.data[i*matrix.m+j]))
+			b.WriteString(fmt.Sprintf("%7.2f", matrix.data[i*matrix.m+j]))
 		}
 		b.WriteString("\n")
 	}
@@ -102,98 +102,15 @@ func (matrix *Matrix) SwapLines(a, b int) {
 	}
 }
 
-func (matrix *Matrix) findNotZeroIndexInCol(idx int, P *Matrix) error {
+func (matrix *Matrix) findNotZeroIndexInCol(idx int) int {
 	line := idx + matrix.m*idx
 
 	for i := idx; i < matrix.n; i++ {
 		if matrix.data[line] != 0 {
-			matrix.SwapLines(idx, i)
-			if P != nil {
-				P.SwapLines(idx, i)
-			}
-			return nil
+			return i
 		}
 		line += matrix.m
 	}
 
-	return errors.New("Вырожденная матрица")
-}
-
-// LUDecomposition : Разделяет матрицу на три:
-// L - нижнетреугольную с еденицами на главной диогонали
-// U - верхнетреугольная
-// P - матрица перестановок (опциональная)
-func (matrix *Matrix) LUDecomposition() (*Matrix, *Matrix, *Matrix, error) {
-	if matrix == nil || matrix.n != matrix.m {
-		return nil, nil, nil, errors.New("Матрица не квадратная")
-	}
-	var (
-		U = matrix.Copy()
-		L = EMatrix(U.n)
-		P = EMatrix(U.n)
-	)
-
-	for col := 0; col < U.m; col++ {
-		err := U.findNotZeroIndexInCol(col, P)
-		if err != nil {
-			return nil, nil, nil, err
-		}
-
-		var (
-			elem     = U.data[col*U.m+col]
-			currLine = col * U.m
-		)
-
-		for line := col + 1; line < U.n; line++ {
-			var (
-				processLine        = line * U.m
-				processLineWithCol = processLine + col
-				coeff              = U.data[processLineWithCol] / elem
-			)
-			L.data[processLineWithCol] = coeff
-
-			for i := 0; i < U.m; i++ {
-				U.data[processLine+i] -= U.data[currLine+i] * coeff
-			}
-		}
-	}
-
-	return L, U, P, nil
-}
-
-func SolveSLAU(matrix *Matrix, b []float64) ([]float64, error) {
-	L, U, P, err := matrix.LUDecomposition()
-	if err != nil {
-		return nil, err
-	}
-	var (
-		x = make([]float64, matrix.n)
-		y = make([]float64, matrix.n)
-	)
-
-	for i := 0; i < matrix.n; i++ {
-		var (
-			num  float64
-			line = i * L.m
-		)
-		for j := 0; j < i; j++ {
-			num += L.data[line+j] * y[j]
-		}
-		y[i] = b[i] - num
-	}
-
-	for i := matrix.n - 1; i >= 0; i-- {
-		var (
-			num  float64
-			line = i * U.m
-		)
-		for j := i + 1; j < matrix.n; j++ {
-			num += U.data[line+j] * x[j]
-		}
-		x[i] = (y[i] - num) / U.Get(i, i)
-	}
-
-	res, _ := P.ProdMatrix(&Matrix{data: x, n: matrix.n, m: 1})
-
-	return res.data, nil
+	return idx
 }

@@ -13,20 +13,20 @@ func scan(ref interface{}) {
 	}
 }
 
-func readSLAU(n int) (*core.Matrix, []float64) {
-	res := core.NewMatrix(n, n)
-	col := make([]float64, n)
+func readSLAU(n int) (*core.Matrix, core.Row) {
+	matrix := core.NewMatrix(n, n)
+	col := make(core.Row, n)
 
 	for i := 0; i < n; i++ {
 		for j := 0; j < n; j++ {
 			var num float64
 			scan(&num)
-			res.Set(i, j, num)
+			matrix.Set(i, j, num)
 		}
 		scan(&col[i])
 	}
 
-	return res, col
+	return matrix, col
 }
 
 /*
@@ -45,7 +45,14 @@ func main() {
 	fmt.Println("Введите элементы матрицы:")
 	matrix, b := readSLAU(n)
 
-	x, err := core.SolveSLAU(matrix, b)
+	lup, err := core.LUDecomposition(matrix)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("%s\nDet(A) = %f\n", core.DisplaySLAU{Matrix: matrix, Row: b}, lup.Determinant())
+
+	x, err := lup.SolveSLAU(b)
 	if err != nil {
 		log.Fatal(err)
 	}
