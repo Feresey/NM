@@ -52,15 +52,15 @@ func LUDecomposition(matrix *Matrix) *LUP {
 	return &LUP{L, U, P, matrix.n, matrix.m}
 }
 
-func (lup *LUP) SolveSLAU(b Row) Row {
+func (lup *LUP) SolveSLAU(b Coloumn) Coloumn {
 	if len(b) != lup.n {
 		return nil
 	}
-	tmp := lup.P.ProdMatrix(&Matrix{data: b, n: lup.n, m: 1})
-	b = tmp.data
+	tmp := lup.P.ProdMatrix(&Matrix{data: Row(b), n: lup.n, m: 1})
+	b = Coloumn(tmp.data)
 	var (
-		x = make(Row, lup.n)
-		y = make(Row, lup.n)
+		x = make(Coloumn, lup.n)
+		y = make(Coloumn, lup.n)
 	)
 
 	for i := 0; i < lup.n; i++ {
@@ -102,7 +102,7 @@ func (lup *LUP) Inverse() *Matrix {
 	res := NewMatrix(lup.n, lup.m)
 
 	for i := 0; i < lup.m; i++ {
-		col := make(Row, lup.n)
+		col := make(Coloumn, lup.n)
 		col[i] = 1
 		resCol := lup.SolveSLAU(col)
 

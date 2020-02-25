@@ -103,7 +103,7 @@ func TestMatrix_LUDecomposition(t *testing.T) {
 	}
 }
 
-func sumRow(matrix *Matrix, prod Row, row int) float64 {
+func sumRow(matrix *Matrix, prod Coloumn, row int) float64 {
 	var (
 		total float64
 		line  = matrix.m * row
@@ -118,7 +118,7 @@ func sumRow(matrix *Matrix, prod Row, row int) float64 {
 func TestSolveSLAU(t *testing.T) {
 	type args struct {
 		matrix *Matrix
-		b      Row
+		b      Coloumn
 	}
 	tests := []struct {
 		name               string
@@ -129,7 +129,7 @@ func TestSolveSLAU(t *testing.T) {
 			name: "empty",
 			args: args{
 				matrix: NewMatrix(0, 0),
-				b:      Row{},
+				b:      Coloumn{},
 			},
 		},
 		{
@@ -148,7 +148,7 @@ func TestSolveSLAU(t *testing.T) {
 					n: 3,
 					m: 3,
 				},
-				b: Row{10, 0, -10},
+				b: Coloumn{10, 0, -10},
 			},
 		},
 		{
@@ -175,7 +175,7 @@ func TestSolveSLAU(t *testing.T) {
 					n: 2,
 					m: 2,
 				},
-				b: Row{1, 2, 3},
+				b: Coloumn{1, 2, 3},
 			},
 			wantErr2: true,
 		},
@@ -190,7 +190,7 @@ func TestSolveSLAU(t *testing.T) {
 					n: 2,
 					m: 2,
 				},
-				b: Row{3, 1},
+				b: Coloumn{3, 1},
 			},
 		},
 		{
@@ -204,7 +204,7 @@ func TestSolveSLAU(t *testing.T) {
 					n: 2,
 					m: 2,
 				},
-				b: Row{3, 1},
+				b: Coloumn{3, 1},
 			},
 		},
 		{
@@ -218,7 +218,7 @@ func TestSolveSLAU(t *testing.T) {
 					n: 2,
 					m: 2,
 				},
-				b: Row{11, 12},
+				b: Coloumn{11, 12},
 			},
 		},
 		{
@@ -233,7 +233,7 @@ func TestSolveSLAU(t *testing.T) {
 					n: 3,
 					m: 3,
 				},
-				b: Row{0, 3, 5},
+				b: Coloumn{0, 3, 5},
 			},
 		},
 		{
@@ -249,7 +249,7 @@ func TestSolveSLAU(t *testing.T) {
 					n: 4,
 					m: 4,
 				},
-				b: Row{-60, -10, 65, 18},
+				b: Coloumn{-60, -10, 65, 18},
 			},
 		},
 		{
@@ -265,7 +265,7 @@ func TestSolveSLAU(t *testing.T) {
 					n: 4,
 					m: 4,
 				},
-				b: Row{24, 41, 0, 20},
+				b: Coloumn{24, 41, 0, 20},
 			},
 		},
 		{
@@ -281,7 +281,7 @@ func TestSolveSLAU(t *testing.T) {
 					n: 4,
 					m: 4,
 				},
-				b: Row{-3, 30, -90, 12},
+				b: Coloumn{-3, 30, -90, 12},
 			},
 		},
 	}

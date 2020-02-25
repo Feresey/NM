@@ -14,9 +14,9 @@ func Scan(ref interface{}) {
 	}
 }
 
-func ReadSLAU(n int) (*core.Matrix, core.Row) {
+func ReadSLAU(n int) (*core.Matrix, core.Coloumn) {
 	matrix := core.NewMatrix(n, n)
-	col := make(core.Row, n)
+	col := make(core.Coloumn, n)
 
 	for i := 0; i < n; i++ {
 		for j := 0; j < n; j++ {

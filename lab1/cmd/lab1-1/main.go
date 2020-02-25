@@ -26,7 +26,7 @@ func main() {
 		log.Fatal("Матрица пустая")
 	}
 
-	fmt.Printf("A:\n%s\n", core.DisplaySLAU{Matrix: matrix, Row: b})
+	fmt.Printf("A:\n%s\n", core.DisplaySLAU{Matrix: matrix, Coloumn: b})
 	// fmt.Printf("L*U*P:\n%s\n", lup.L.ProdMatrix(lup.U).ProdMatrix(lup.P))
 	// fmt.Printf("L:\n%s\nU:\n%s\nP:\n%s\n", lup.L, lup.U, lup.P)
 	fmt.Printf("Det(A) = %f\n", lup.Determinant())

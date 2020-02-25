@@ -1,5 +1,5 @@
 .PHONY: all clean test
-TESTS = $(wildcard tests/test-*)
+TESTS = 
 
 all:
 	@mkdir -p ./build/
@@ -8,5 +8,9 @@ all:
 clean:
 	@rm -vrf ./build/
 
-test: $(TESTS)
-	$(foreach test,$^, ./build/lab1 < $(test) && sleep 1; echo ;)
+test-1: $(wildcard tests/test-1-*)
+	$(foreach test,$^, ./build/lab1-1 < $(test) && sleep 1; echo ;)
+
+
+test-2: $(wildcard tests/test-2-*)
+	$(foreach test,$^, ./build/lab1-2 < $(test) && sleep 1; echo ;)
