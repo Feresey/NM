@@ -126,7 +126,7 @@ func (d DisplaySLAU) String() string {
 		for j := 1; j < d.m; j++ {
 			b.WriteString(fmt.Sprintf(" +%6.2f*x%d", d.data[line+j], j+1))
 		}
-		b.WriteString(fmt.Sprintf(" = %6.2f\n", d.Row[i]))
+		b.WriteString(fmt.Sprintf(" = %6.2f\n", d.Coloumn[i]))
 	}
 
 	return b.String()

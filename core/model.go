@@ -1,6 +1,9 @@
 package core
 
-type Row []float64
+type (
+	Row     []float64
+	Coloumn []float64
+)
 
 // Matrix : type for process core actions
 type Matrix struct {
@@ -21,7 +24,7 @@ func NewMatrix(N, M int) *Matrix {
 
 type DisplaySLAU struct {
 	*Matrix
-	Row
+	Coloumn
 }
 
 type LUP struct {

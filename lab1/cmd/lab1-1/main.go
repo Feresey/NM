@@ -1,33 +1,12 @@
 package main
 
 import (
-	"NM/core"
 	"fmt"
 	"log"
+
+	"github.com/Feresey/NM/core"
+	common "github.com/Feresey/NM/lab1"
 )
-
-func scan(ref interface{}) {
-	_, err := fmt.Scan(ref)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func readSLAU(n int) (*core.Matrix, core.Row) {
-	matrix := core.NewMatrix(n, n)
-	col := make(core.Row, n)
-
-	for i := 0; i < n; i++ {
-		for j := 0; j < n; j++ {
-			var num float64
-			scan(&num)
-			matrix.Set(i, j, num)
-		}
-		scan(&col[i])
-	}
-
-	return matrix, col
-}
 
 /*
 	Формат:
@@ -39,8 +18,8 @@ func readSLAU(n int) (*core.Matrix, core.Row) {
 */
 func main() {
 	n := 0
-	scan(&n)
-	matrix, b := readSLAU(n)
+	common.Scan(&n)
+	matrix, b := common.ReadSLAU(n)
 
 	lup := core.LUDecomposition(matrix)
 	if lup == nil {
