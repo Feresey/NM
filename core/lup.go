@@ -11,6 +11,9 @@ import (
 // U - верхнетреугольная
 // P - матрица перестановок (опциональная)
 func LUDecomposition(matrix *Matrix) *LUP {
+	if matrix == nil || matrix.n != matrix.m {
+		return nil
+	}
 	var (
 		L = NewMatrix(matrix.n, matrix.m)
 		U = matrix.Copy()
@@ -36,7 +39,7 @@ func LUDecomposition(matrix *Matrix) *LUP {
 			)
 			L.data[processLineWithCol] = coeff
 
-			for i := 0; i < U.m; i++ {
+			for i := 0; i < U.n; i++ {
 				U.data[processLine+i] -= U.data[currLine+i] * coeff
 			}
 		}
@@ -46,7 +49,7 @@ func LUDecomposition(matrix *Matrix) *LUP {
 		L.data[line] = 1
 	}
 
-	return &LUP{L: L, U: U, P: P, n: matrix.n, m: matrix.m}
+	return &LUP{L, U, P, matrix.n, matrix.m}
 }
 
 func (lup *LUP) SolveSLAU(b Row) Row {
