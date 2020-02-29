@@ -88,11 +88,12 @@ func (lup *LUP) SolveSLAU(b Coloumn) Coloumn {
 }
 
 func (lup *LUP) Determinant() float64 {
-	lineIter := 0
+	if len(lup.P.data) == 0 {
+		return 0
+	}
 	var res float64 = 1
-	for lineIter < len(lup.U.data) {
-		res *= lup.U.data[lineIter]
-		lineIter += lup.m + 1
+	for line := 0; line < len(lup.U.data); line += lup.m + 1 {
+		res *= lup.U.data[line]
 	}
 
 	var (

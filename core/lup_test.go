@@ -124,6 +124,7 @@ func TestSolveSLAU(t *testing.T) {
 		name               string
 		args               args
 		wantErr1, wantErr2 bool
+		det                float64
 	}{
 		{
 			name: "empty",
@@ -192,6 +193,7 @@ func TestSolveSLAU(t *testing.T) {
 				},
 				b: Coloumn{3, 1},
 			},
+			det: 1,
 		},
 		{
 			name: "simple rotated",
@@ -206,6 +208,7 @@ func TestSolveSLAU(t *testing.T) {
 				},
 				b: Coloumn{3, 1},
 			},
+			det: -1,
 		},
 		{
 			name: "hard",
@@ -220,6 +223,7 @@ func TestSolveSLAU(t *testing.T) {
 				},
 				b: Coloumn{11, 12},
 			},
+			det: -7,
 		},
 		{
 			name: "harder",
@@ -235,6 +239,7 @@ func TestSolveSLAU(t *testing.T) {
 				},
 				b: Coloumn{0, 3, 5},
 			},
+			det: 3,
 		},
 		{
 			name: "big",
@@ -251,6 +256,7 @@ func TestSolveSLAU(t *testing.T) {
 				},
 				b: Coloumn{-60, -10, 65, 18},
 			},
+			det: -356,
 		},
 		{
 			name: "also big",
@@ -267,6 +273,7 @@ func TestSolveSLAU(t *testing.T) {
 				},
 				b: Coloumn{24, 41, 0, 20},
 			},
+			det: 8,
 		},
 		{
 			name: "fuck",
@@ -283,6 +290,7 @@ func TestSolveSLAU(t *testing.T) {
 				},
 				b: Coloumn{-3, 30, -90, 12},
 			},
+			det: 2239,
 		},
 	}
 	for _, tt := range tests {
@@ -308,6 +316,15 @@ func TestSolveSLAU(t *testing.T) {
 					t.Errorf("incorrect answer. got: %v, but sum of %d is %f, expected %f", got, i, tmp, -tt.args.b[i])
 				}
 			}
+			inverse := lup.Inverse()
+			if !matrixEqual(tt.args.matrix.ProdMatrix(inverse), EMatrix(tt.args.matrix.n)) {
+				t.Error("Inverse matrix does not correct")
+			}
+			if tmp := lup.Determinant(); math.Abs(tt.det-tmp) > EPS {
+				t.Errorf("Incorrect det. got: %f, expected: %f", tmp, tt.det)
+			}
 		})
 	}
+
+	_ = DisplaySLAU{Matrix: EMatrix(3), Coloumn: Coloumn{1, 1, 1}}.String()
 }
