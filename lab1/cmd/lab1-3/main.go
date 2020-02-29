@@ -10,23 +10,28 @@ import (
 
 /*
 	Формат:
-	n
+	eps n
 	a11 a12 ... b1
 	a21 a22 ... b2
 	... ... ... ...
 	... ... ann bn
 */
 func main() {
-	n := 0
+	var (
+		eps float64
+		n   int
+	)
+	common.Scan(&eps)
 	common.Scan(&n)
 	matrix, b := common.ReadSLAU(n)
 
-	x := matrix.RunThrough(b)
+	x, total := matrix.Iterations(b, eps)
 	if x == nil {
 		log.Fatal("Матрица пустая")
 	}
 	fmt.Printf("A:\n%s\n", core.DisplaySLAU{Matrix: matrix, Coloumn: b})
 
+	fmt.Println("Total iterations: ", total)
 	for idx := range x {
 		fmt.Printf("x%d = %f\n", idx+1, x[idx])
 	}
