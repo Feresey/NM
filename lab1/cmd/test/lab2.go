@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 
 	"github.com/Feresey/NM/core"
@@ -16,10 +17,10 @@ import (
 	... ... ... ...
 	... ... ann bn
 */
-func main() {
+func lab2(r io.Reader) {
 	n := 0
-	common.Scan(&n)
-	matrix, b := common.ReadSLAU(n)
+	common.Fscan(r, &n)
+	matrix, b := common.ReadSLAU(r, n)
 
 	x := matrix.RunThrough(b)
 	if x == nil {

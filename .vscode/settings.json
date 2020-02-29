@@ -1,8 +1,0 @@
-{
-    "go.lintTool": "golangci-lint",
-    "cSpell.enableFiletypes": [
-        "!go",
-        "latex",
-        "markdown"
-    ]
-}

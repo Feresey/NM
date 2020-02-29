@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 
 	"github.com/Feresey/NM/core"
@@ -16,20 +17,20 @@ import (
 	... ... ... ...
 	... ... ann bn
 */
-func main() {
+func lab3(r io.Reader) {
 	var (
 		eps float64
 		n   int
 	)
-	common.Scan(&eps)
-	common.Scan(&n)
-	matrix, b := common.ReadSLAU(n)
+	common.Fscan(r, &eps)
+	common.Fscan(r, &n)
+	matrix, b := common.ReadSLAU(r, n)
+	fmt.Printf("A:\n%s\n", core.DisplaySLAU{Matrix: matrix, Coloumn: b})
 
 	x, total := matrix.Iterations(b, eps)
 	if x == nil {
 		log.Fatal("Матрица пустая")
 	}
-	fmt.Printf("A:\n%s\n", core.DisplaySLAU{Matrix: matrix, Coloumn: b})
 
 	fmt.Println("Total iterations: ", total)
 	for idx := range x {
