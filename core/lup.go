@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"math"
 	"strings"
 )
 
@@ -95,7 +94,26 @@ func (lup *LUP) Determinant() float64 {
 		res *= lup.U.data[lineIter]
 		lineIter += lup.m + 1
 	}
-	return math.Abs(res)
+
+	var (
+		used = make([]bool, lup.n)
+		prod = 0
+		line = 0
+	)
+	for i := 0; i < lup.m; i++ {
+		idx := lup.P.findNotZeroIndexInCol(i)
+		if idx != i && !used[i] {
+			prod++
+		}
+		used[i] = true
+		used[idx] = true
+		line += lup.m + 1
+	}
+
+	if prod&1 == 1 {
+		res *= -1
+	}
+	return res
 }
 
 func (lup *LUP) Inverse() *Matrix {

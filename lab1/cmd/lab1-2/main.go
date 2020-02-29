@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/Feresey/NM/core"
 	common "github.com/Feresey/NM/lab1"
 )
 
@@ -24,6 +25,7 @@ func main() {
 	if x == nil {
 		log.Fatal("Матрица пустая")
 	}
+	fmt.Printf("A:\n%s\n", core.DisplaySLAU{Matrix: matrix, Coloumn: b})
 
 	for idx := range x {
 		fmt.Printf("x%d = %f\n", idx+1, x[idx])
