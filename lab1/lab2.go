@@ -6,7 +6,6 @@ import (
 	"log"
 
 	"github.com/Feresey/NM/core"
-	common "github.com/Feresey/NM/lab1"
 )
 
 /*
@@ -19,8 +18,8 @@ import (
 */
 func lab2(r io.Reader) {
 	n := 0
-	common.Fscan(r, &n)
-	matrix, b := common.ReadSLAU(r, n)
+	Fscan(r, &n)
+	matrix, b := ReadSLAU(r, n)
 
 	x := matrix.RunThrough(b)
 	if x == nil {

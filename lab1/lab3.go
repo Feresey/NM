@@ -6,7 +6,6 @@ import (
 	"log"
 
 	"github.com/Feresey/NM/core"
-	common "github.com/Feresey/NM/lab1"
 )
 
 /*
@@ -22,9 +21,9 @@ func lab3(r io.Reader) {
 		eps float64
 		n   int
 	)
-	common.Fscan(r, &eps)
-	common.Fscan(r, &n)
-	matrix, b := common.ReadSLAU(r, n)
+	Fscan(r, &eps)
+	Fscan(r, &n)
+	matrix, b := ReadSLAU(r, n)
 	fmt.Printf("A:\n%s\n", core.DisplaySLAU{Matrix: matrix, Coloumn: b})
 
 	x, total := matrix.Iterations(b, eps)
