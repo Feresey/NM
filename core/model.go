@@ -13,15 +13,6 @@ type Matrix struct {
 	// Number rows
 	m int
 }
-
-// NewMatrix : create a new matrix
-func NewMatrix(N, M int) *Matrix {
-	res := &Matrix{n: N, m: M}
-	res.data = make(Row, N*M)
-
-	return res
-}
-
 type DisplaySLAU struct {
 	*Matrix
 	Coloumn

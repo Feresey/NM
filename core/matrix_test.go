@@ -6,17 +6,17 @@ import (
 
 const EPS = 1e-9
 
-func matrixEqual(a, b *Matrix) bool {
-	return floatEqual(a.data, b.data)
+func matrixEqual(a, b *Matrix, eps float64) bool {
+	return floatEqual(a.data, b.data, eps)
 }
 
-func floatEqual(a, b []float64) bool {
+func floatEqual(a, b []float64, eps float64) bool {
 	if len(a) != len(b) {
 		return false
 	}
 
 	for i := range a {
-		if tmp := a[i] - b[i]; tmp > 0 && tmp > EPS || tmp < 0 && tmp < -EPS {
+		if tmp := a[i] - b[i]; tmp > 0 && tmp > eps || tmp < 0 && tmp < -eps {
 			return false
 		}
 	}
@@ -144,7 +144,7 @@ func TestMatrix_ProdMatrix(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := tt.Matrix.ProdMatrix(&tt.arg)
 
-			if !tt.wantErr && !matrixEqual(got, &tt.want) {
+			if !tt.wantErr && !matrixEqual(got, &tt.want, EPS) {
 				t.Errorf("Given:\n%s\nWant:\n%s", got, tt.want)
 			}
 		})
@@ -223,7 +223,7 @@ func TestMatrix_SwapLines(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.Matrix.SwapLines(tt.arg.a, tt.arg.b)
-			if !matrixEqual(&tt.Matrix, &tt.wantMatrix) {
+			if !matrixEqual(&tt.Matrix, &tt.wantMatrix, EPS) {
 				t.Errorf("Given:\n%s\nWant:\n%s", tt.Matrix, tt.wantMatrix)
 			}
 		})
@@ -359,8 +359,48 @@ func TestMatrix_Set(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.Matrix.Set(tt.args.i, tt.args.j, tt.args.value)
-			if !matrixEqual(&tt.Matrix, &tt.want) {
+			if !matrixEqual(&tt.Matrix, &tt.want, EPS) {
 				t.Errorf("Given:\n%s\nWant:\n%s", tt.Matrix, tt.want)
+			}
+		})
+	}
+}
+
+func TestMatrix_String(t *testing.T) {
+	tests := []struct {
+		name string
+		Matrix
+		want string
+	}{
+		{
+			name: "suqare",
+			Matrix: Matrix{
+				data: Row{
+					1, 2,
+					3, 4,
+				},
+				n: 2,
+				m: 2,
+			},
+			want: "   1.00   2.00\n   3.00   4.00\n",
+		},
+		{
+			name: "not suqare",
+			Matrix: Matrix{
+				data: Row{
+					1, 2, 3,
+					4, 5, 6,
+				},
+				n: 2,
+				m: 3,
+			},
+			want: "   1.00   2.00   3.00\n   4.00   5.00   6.00\n",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.Matrix.String(); got != tt.want {
+				t.Errorf("Matrix.String() = %v, want %v", got, tt.want)
 			}
 		})
 	}

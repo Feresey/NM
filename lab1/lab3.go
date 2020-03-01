@@ -21,12 +21,12 @@ func lab3(r io.Reader) {
 		eps float64
 		n   int
 	)
-	Fscan(r, &eps)
-	Fscan(r, &n)
-	matrix, b := ReadSLAU(r, n)
+	fscan(r, &eps)
+	fscan(r, &n)
+	matrix, b := readSLAU(r, n)
 	fmt.Printf("A:\n%s\n", core.DisplaySLAU{Matrix: matrix, Coloumn: b})
 
-	x, total := matrix.Iterations(b, eps)
+	x, total := core.Iterations(matrix, b, eps)
 	if x == nil {
 		log.Fatal("Матрица пустая")
 	}

@@ -96,8 +96,8 @@ func TestMatrix_LUDecomposition(t *testing.T) {
 			}
 			got := lup.L.ProdMatrix(lup.U).ProdMatrix(lup.P)
 
-			if !matrixEqual(got, &tt.Matrix) {
-				t.Errorf("L Given:\n%s\nWant:\n%s", got, tt.Matrix)
+			if !matrixEqual(got, &tt.Matrix, EPS) {
+				t.Errorf("Given:\n%s\nWant:\n%s", got, tt.Matrix)
 			}
 		})
 	}
@@ -317,7 +317,7 @@ func TestSolveSLAU(t *testing.T) {
 				}
 			}
 			inverse := lup.Inverse()
-			if !matrixEqual(tt.args.matrix.ProdMatrix(inverse), EMatrix(tt.args.matrix.n)) {
+			if !matrixEqual(tt.args.matrix.ProdMatrix(inverse), EMatrix(tt.args.matrix.n), EPS) {
 				t.Error("Inverse matrix does not correct")
 			}
 			if tmp := lup.Determinant(); math.Abs(tt.det-tmp) > EPS {

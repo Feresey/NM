@@ -18,10 +18,10 @@ import (
 */
 func lab2(r io.Reader) {
 	n := 0
-	Fscan(r, &n)
-	matrix, b := ReadSLAU(r, n)
+	fscan(r, &n)
+	matrix, b := readSLAU(r, n)
 
-	x := matrix.RunThrough(b)
+	x := core.RunThrough(matrix, b)
 	if x == nil {
 		log.Fatal("Матрица пустая")
 	}

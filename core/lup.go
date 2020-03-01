@@ -81,7 +81,7 @@ func (lup *LUP) SolveSLAU(b Coloumn) Coloumn {
 		for j := i + 1; j < lup.n; j++ {
 			num += lup.U.data[line+j] * x[j]
 		}
-		x[i] = (y[i] - num) / lup.U.Get(i, i)
+		x[i] = (y[i] - num) / lup.U.data[line+i]
 	}
 
 	return x
@@ -98,20 +98,20 @@ func (lup *LUP) Determinant() float64 {
 
 	var (
 		used = make([]bool, lup.n)
-		prod = 0
+		prod = false
 		line = 0
 	)
 	for i := 0; i < lup.m; i++ {
 		idx := lup.P.findNotZeroIndexInCol(i)
 		if idx != i && !used[i] {
-			prod++
+			prod = !prod
 		}
 		used[i] = true
 		used[idx] = true
 		line += lup.m + 1
 	}
 
-	if prod&1 == 1 {
+	if prod {
 		res *= -1
 	}
 	return res

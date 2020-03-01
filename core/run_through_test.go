@@ -38,7 +38,7 @@ func TestMatrix_RunThrough(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.Matrix.RunThrough(tt.args.col); !reflect.DeepEqual(got, tt.want) {
+			if got := RunThrough(tt.Matrix, tt.args.col); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Matrix.RunThrough() = %v, want %v", got, tt.want)
 			}
 		})

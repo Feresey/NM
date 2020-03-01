@@ -1,6 +1,6 @@
 package core
 
-func (matrix *Matrix) RunThrough(col Coloumn) Coloumn {
+func RunThrough(matrix *Matrix, col Coloumn) Coloumn {
 	if matrix == nil || matrix.n != matrix.m {
 		return nil
 	}

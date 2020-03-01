@@ -25,12 +25,13 @@ func norm(data []float64) (res float64) {
 	return
 }
 
-func (matrix *Matrix) Iterations(col Coloumn, eps float64) (res Coloumn, iterations int) {
+func Iterations(matrix *Matrix, col Coloumn, eps float64) (res Coloumn, iterations int) {
 	if matrix == nil || matrix.n != matrix.m {
 		return
 	}
 	beta := make(Coloumn, len(col))
 	copy(beta, col)
+	matrix = matrix.Copy()
 
 	line := 0
 	for i := 0; i < matrix.n; i++ {

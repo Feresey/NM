@@ -35,29 +35,14 @@ func (matrix *Matrix) GetSize() (rows, coloumns int) {
 func (matrix Matrix) String() string {
 	b := strings.Builder{}
 
-	for i := 0; i < matrix.n; i++ {
-		for j := 0; j < matrix.m; j++ {
-			b.WriteString(fmt.Sprintf("%7.2f", matrix.data[i*matrix.m+j]))
+	for line := 0; line < len(matrix.data); line += matrix.m {
+		for _, val := range matrix.data[line : line+matrix.m] {
+			b.WriteString(fmt.Sprintf("%7.2f", val))
 		}
 		b.WriteString("\n")
 	}
 
 	return b.String()
-}
-
-// EMatrix : создает единичную матрицу размера nxn
-func EMatrix(n int) *Matrix {
-	var (
-		E   = NewMatrix(n, n)
-		row int
-	)
-
-	for i := 0; i < n; i++ {
-		E.data[row+i] = 1
-		row += n
-	}
-
-	return E
 }
 
 // ProdMatrix : перемножает матрицы

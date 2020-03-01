@@ -94,7 +94,7 @@ func TestMatrix_Iterations(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, gotIterations := tt.Matrix.Iterations(tt.args.col, tt.args.eps)
+			gotRes, gotIterations := Iterations(tt.Matrix, tt.args.col, tt.args.eps)
 			for idx := range gotRes {
 				if math.Abs(gotRes[idx]-tt.wantRes[idx]) > tt.args.eps {
 					t.Errorf("Matrix.Iterations() gotRes = %v, want %v, iterations: %d", gotRes, tt.wantRes, gotIterations)

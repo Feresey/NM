@@ -18,8 +18,8 @@ import (
 */
 func lab1(r io.Reader) {
 	n := 0
-	Fscan(r, &n)
-	matrix, b := ReadSLAU(r, n)
+	fscan(r, &n)
+	matrix, b := readSLAU(r, n)
 
 	lup := core.LUDecomposition(matrix)
 	if lup == nil {
