@@ -40,8 +40,9 @@ func getSquareSum(m *Matrix) (sum float64) {
 	return math.Sqrt(sum)
 }
 
-func Rotations(matrix *Matrix, eps float64) (sz Coloumn, sv *Matrix, iterations int) {
-	if matrix == nil || matrix.n != matrix.m {
+func Rotations(matrix *Matrix, eps float64) (sz Coloumn, sv *Matrix, iterations int, err error) {
+	if matrix.n != matrix.m {
+		err = IncorrectColoumn
 		return
 	}
 	sv = EMatrix(matrix.n)

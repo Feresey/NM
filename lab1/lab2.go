@@ -21,9 +21,9 @@ func lab2(r io.Reader) {
 	fscan(r, &n)
 	matrix, b := readSLAU(r, n)
 
-	x := core.RunThrough(matrix, b)
-	if x == nil {
-		log.Fatal("Матрица пустая")
+	x, err := core.RunThrough(matrix, b)
+	if err != nil {
+		log.Fatal(err)
 	}
 	fmt.Printf("A:\n%s\n", core.DisplaySLAU{Matrix: matrix, Coloumn: b})
 

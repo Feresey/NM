@@ -1,6 +1,8 @@
 package core
 
-import "math"
+import (
+	"math"
+)
 
 func (matrix *Matrix) norm() (res float64) {
 	for line := 0; line < len(matrix.data); line += matrix.m {
@@ -25,8 +27,9 @@ func norm(data []float64) (res float64) {
 	return
 }
 
-func Iterations(matrix *Matrix, col Coloumn, eps float64) (res Coloumn, iterations int) {
-	if matrix == nil || matrix.n != matrix.m {
+func Iterations(matrix *Matrix, col Coloumn, eps float64) (res Coloumn, iterations int, err error) {
+	if matrix.n != matrix.m {
+		err = IncorrectColoumn
 		return
 	}
 	beta := make(Coloumn, len(col))

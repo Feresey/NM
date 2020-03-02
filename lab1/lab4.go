@@ -25,10 +25,11 @@ func lab4(r io.Reader) {
 	matrix := readMatrix(r, n)
 	fmt.Printf("A:\n%s\n", matrix)
 
-	sz, sv, total := core.Rotations(matrix, eps)
+	sz, sv, total, err := core.Rotations(matrix, eps)
 	_ = sz
 	_ = sv
 	_ = total
+	_ = err
 	// if x == nil {
 	// 	log.Fatal("Матрица пустая")
 	// }

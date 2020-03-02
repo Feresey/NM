@@ -26,9 +26,9 @@ func lab3(r io.Reader) {
 	matrix, b := readSLAU(r, n)
 	fmt.Printf("A:\n%s\n", core.DisplaySLAU{Matrix: matrix, Coloumn: b})
 
-	x, total := core.Iterations(matrix, b, eps)
-	if x == nil {
-		log.Fatal("Матрица пустая")
+	x, total, err := core.Iterations(matrix, b, eps)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	fmt.Println("Total iterations: ", total)

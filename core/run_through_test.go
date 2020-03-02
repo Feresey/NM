@@ -1,7 +1,6 @@
 package core
 
 import (
-	"reflect"
 	"testing"
 )
 
@@ -12,8 +11,9 @@ func TestMatrix_RunThrough(t *testing.T) {
 	tests := []struct {
 		name string
 		*Matrix
-		args args
-		want Coloumn
+		args    args
+		want    Coloumn
+		wantErr bool
 	}{
 		{
 			name: "simple",
@@ -32,13 +32,14 @@ func TestMatrix_RunThrough(t *testing.T) {
 			},
 			want: Coloumn{1, 1, 1, 1},
 		},
-		{
-			name: "nil",
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := RunThrough(tt.Matrix, tt.args.col); !reflect.DeepEqual(got, tt.want) {
+			got, err := RunThrough(tt.Matrix, tt.args.col)
+			if (err != nil) != tt.wantErr {
+				t.Error("Error: ", err)
+			}
+			if !floatEqual(got, tt.want, EPS) {
 				t.Errorf("Matrix.RunThrough() = %v, want %v", got, tt.want)
 			}
 		})

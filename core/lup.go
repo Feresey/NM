@@ -1,6 +1,7 @@
 package core
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -9,22 +10,29 @@ import (
 // L - нижнетреугольную с еденицами на главной диогонали
 // U - верхнетреугольная
 // P - матрица перестановок (опциональная)
-func LUDecomposition(matrix *Matrix) *LUP {
-	if matrix == nil || matrix.n != matrix.m {
-		return nil
+func LUDecomposition(matrix *Matrix) (*LUP, error) {
+	if matrix.n != matrix.m {
+		return nil, errors.New("Матрица не квадратная")
 	}
 	var (
 		L = NewMatrix(matrix.n, matrix.m)
 		U = matrix.Copy()
-		P = EMatrix(matrix.n)
+		P = make([]int, matrix.n)
 	)
+	for i := 0; i < matrix.n; i++ {
+		P[i] = i
+	}
 
 	for col := 0; col < U.m; col++ {
-		idx := U.findNotZeroIndexInCol(col)
-		L.SwapLines(col, idx)
-		U.SwapLines(col, idx)
-		P.SwapLines(col, idx)
-
+		idx := U.maxInCol(col, col)
+		if idx == -1 {
+			return nil, errors.New("Матрица вырожденная")
+		}
+		if idx != col {
+			P[col], P[idx] = P[idx], P[col]
+			L.SwapLines(col, idx)
+			U.SwapLines(col, idx)
+		}
 		var (
 			elem     = U.data[col*U.m+col]
 			currLine = col * U.m
@@ -48,14 +56,14 @@ func LUDecomposition(matrix *Matrix) *LUP {
 		L.data[line] = 1
 	}
 
-	return &LUP{L, U, P, matrix.n, matrix.m}
+	return &LUP{L, U, P, matrix.n, matrix.m}, nil
 }
 
-func (lup *LUP) SolveSLAU(b Coloumn) Coloumn {
+func (lup *LUP) SolveSLAU(b Coloumn) (Coloumn, error) {
 	if len(b) != lup.n {
-		return nil
+		return nil, IncorrectColoumn
 	}
-	tmp := lup.P.ProdMatrix(&Matrix{data: Row(b), n: lup.n, m: 1})
+	tmp := lup.SwapMatrix(&Matrix{data: Row(b), n: lup.n, m: 1}, true)
 	b = Coloumn(tmp.data)
 	var (
 		x = make(Coloumn, lup.n)
@@ -84,11 +92,14 @@ func (lup *LUP) SolveSLAU(b Coloumn) Coloumn {
 		x[i] = (y[i] - num) / lup.U.data[line+i]
 	}
 
-	return x
+	return x, nil
+	// tmp = lup.SwapMatrix(&Matrix{data: Row(x), n: lup.n, m: 1})
+
+	// return Coloumn(tmp.data), nil
 }
 
 func (lup *LUP) Determinant() float64 {
-	if len(lup.P.data) == 0 {
+	if lup.n == 0 {
 		return 0
 	}
 	var res float64 = 1
@@ -99,16 +110,13 @@ func (lup *LUP) Determinant() float64 {
 	var (
 		used = make([]bool, lup.n)
 		prod = false
-		line = 0
 	)
-	for i := 0; i < lup.m; i++ {
-		idx := lup.P.findNotZeroIndexInCol(i)
-		if idx != i && !used[i] {
+	for idx, val := range lup.P {
+		if idx != val && !used[idx] {
 			prod = !prod
 		}
-		used[i] = true
 		used[idx] = true
-		line += lup.m + 1
+		used[val] = true
 	}
 
 	if prod {
@@ -123,7 +131,7 @@ func (lup *LUP) Inverse() *Matrix {
 	for i := 0; i < lup.m; i++ {
 		col := make(Coloumn, lup.n)
 		col[i] = 1
-		resCol := lup.SolveSLAU(col)
+		resCol, _ := lup.SolveSLAU(col)
 
 		line := i
 		for _, val := range resCol {
@@ -132,6 +140,19 @@ func (lup *LUP) Inverse() *Matrix {
 		}
 	}
 
+	return res
+}
+
+func (lup *LUP) SwapMatrix(m *Matrix, reverse bool) *Matrix {
+	res := NewMatrix(m.n, m.m)
+	for idx, val := range lup.P {
+		from := m.m * idx
+		to := m.m * val
+		if reverse {
+			to, from = from, to
+		}
+		copy(res.data[to:to+m.m], m.data[from:from+m.m])
+	}
 	return res
 }
 

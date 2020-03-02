@@ -2,8 +2,10 @@ package core
 
 import (
 	"fmt"
+	"math"
 	"strings"
 )
+
 
 // Get : return elem
 func (matrix *Matrix) Get(i, j int) float64 {
@@ -86,15 +88,17 @@ func (matrix *Matrix) SwapLines(a, b int) {
 	}
 }
 
-func (matrix *Matrix) findNotZeroIndexInCol(idx int) int {
-	line := idx + matrix.m*idx
-
-	for i := idx; i < matrix.n; i++ {
-		if matrix.data[line] != 0 {
-			return i
+func (matrix *Matrix) maxInCol(col, from int) int {
+	var (
+		res = -1
+		max = EPS
+	)
+	for i := from; i < matrix.n; i++ {
+		if tmp := math.Abs(matrix.data[matrix.m*i+col]); tmp > max {
+			max = tmp
+			res = i
 		}
-		line += matrix.m
 	}
 
-	return idx
+	return res
 }

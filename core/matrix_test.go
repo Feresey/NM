@@ -4,8 +4,6 @@ import (
 	"testing"
 )
 
-const EPS = 1e-9
-
 func matrixEqual(a, b *Matrix, eps float64) bool {
 	return floatEqual(a.data, b.data, eps)
 }
@@ -230,10 +228,11 @@ func TestMatrix_SwapLines(t *testing.T) {
 	}
 }
 
-func TestMatrix_findNotZeroIndexInCol(t *testing.T) {
+func TestMatrix_findMaxInCol(t *testing.T) {
 	tests := []struct {
 		name string
 		Matrix
+		col  int
 		from int
 		want int
 	}{
@@ -247,6 +246,7 @@ func TestMatrix_findNotZeroIndexInCol(t *testing.T) {
 				n: 2,
 				m: 2,
 			},
+			col:  0,
 			from: 0,
 			want: 1,
 		},
@@ -261,14 +261,29 @@ func TestMatrix_findNotZeroIndexInCol(t *testing.T) {
 				n: 3,
 				m: 3,
 			},
+			col:  1,
+			from: 1,
+			want: -1,
+		},
+		{
+			name: "last",
+			Matrix: Matrix{
+				data: []float64{
+					0, 1,
+					1, 1,
+				},
+				n: 2,
+				m: 2,
+			},
+			col:  1,
 			from: 1,
 			want: 1,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.Matrix.findNotZeroIndexInCol(tt.from); got != tt.want {
-				t.Errorf("Given:\n%d\nWant:\n%d", tt.from, tt.want)
+			if got := tt.Matrix.maxInCol(tt.col, tt.from); got != tt.want {
+				t.Errorf("Given: %d. Want: %d", got, tt.want)
 			}
 		})
 	}

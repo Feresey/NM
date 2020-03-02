@@ -1,8 +1,8 @@
 package core
 
-func RunThrough(matrix *Matrix, col Coloumn) Coloumn {
-	if matrix == nil || matrix.n != matrix.m {
-		return nil
+func RunThrough(matrix *Matrix, col Coloumn) (Coloumn, error) {
+	if matrix.n != matrix.m {
+		return nil, IncorrectColoumn
 	}
 	var (
 		P   = make(Coloumn, matrix.n)
@@ -28,5 +28,5 @@ func RunThrough(matrix *Matrix, col Coloumn) Coloumn {
 		res[i] = P[i]*res[i+1] + Q[i]
 	}
 
-	return res
+	return res, nil
 }

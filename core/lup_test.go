@@ -12,19 +12,6 @@ func TestMatrix_LUDecomposition(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "hard",
-			Matrix: Matrix{
-				data: Row{
-					3, 4, -9, 5,
-					-15, -12, 50, -16,
-					-27, -36, 73, 8,
-					9, 12, -10, -16,
-				},
-				n: 4,
-				m: 4,
-			},
-		},
-		{
 			name: "simple",
 			Matrix: Matrix{
 				data: Row{
@@ -58,6 +45,20 @@ func TestMatrix_LUDecomposition(t *testing.T) {
 				n: 3,
 				m: 3,
 			},
+			wantErr: true,
+		},
+		{
+			name: "hard",
+			Matrix: Matrix{
+				data: Row{
+					3, 4, -9, 5,
+					-15, -12, 50, -16,
+					-27, -36, 73, 8,
+					9, 12, -10, -16,
+				},
+				n: 4,
+				m: 4,
+			},
 		},
 		{
 			name: "fuck",
@@ -70,6 +71,7 @@ func TestMatrix_LUDecomposition(t *testing.T) {
 				n: 3,
 				m: 3,
 			},
+			wantErr: true,
 		},
 		{
 			name: "zero",
@@ -82,22 +84,24 @@ func TestMatrix_LUDecomposition(t *testing.T) {
 				n: 3,
 				m: 3,
 			},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			lup := LUDecomposition(&tt.Matrix)
-			if (lup == nil) != tt.wantErr {
-				t.Error("Matrix is nil")
+			lup, err := LUDecomposition(&tt.Matrix)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("error: %v, wantErr: %t", err, tt.wantErr)
 				return
 			}
 			if tt.wantErr {
 				return
 			}
-			got := lup.L.ProdMatrix(lup.U).ProdMatrix(lup.P)
+			got := lup.SwapMatrix(lup.L.ProdMatrix(lup.U), false)
 
 			if !matrixEqual(got, &tt.Matrix, EPS) {
 				t.Errorf("Given:\n%s\nWant:\n%s", got, tt.Matrix)
+				// t.Error(lup.P)
 			}
 		})
 	}
@@ -134,10 +138,6 @@ func TestSolveSLAU(t *testing.T) {
 			},
 		},
 		{
-			name:     "nil",
-			wantErr1: true,
-		},
-		{
 			name: "zero",
 			args: args{
 				matrix: &Matrix{
@@ -151,6 +151,7 @@ func TestSolveSLAU(t *testing.T) {
 				},
 				b: Coloumn{10, 0, -10},
 			},
+			wantErr1: true,
 		},
 		{
 			name: "not square_1",
@@ -256,7 +257,7 @@ func TestSolveSLAU(t *testing.T) {
 				},
 				b: Coloumn{-60, -10, 65, 18},
 			},
-			det: -356,
+			det: 356,
 		},
 		{
 			name: "also big",
@@ -273,7 +274,7 @@ func TestSolveSLAU(t *testing.T) {
 				},
 				b: Coloumn{24, 41, 0, 20},
 			},
-			det: 8,
+			det: -8,
 		},
 		{
 			name: "fuck",
@@ -295,16 +296,21 @@ func TestSolveSLAU(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			lup := LUDecomposition(tt.args.matrix)
-			if (lup == nil) != tt.wantErr1 {
-				t.Errorf("LUDecomposition() wantErr %v", tt.wantErr1)
-				return
+			lup, err := LUDecomposition(tt.args.matrix)
+			if (err != nil) != tt.wantErr1 {
+				t.Error("Unexpected error: ", err)
 			}
 			if tt.wantErr1 {
 				return
 			}
-			got := lup.SolveSLAU(tt.args.b)
-			if (got == nil) != tt.wantErr2 {
+
+			// gat := lup.L.ProdMatrix(lup.U)
+			// tmp := lup.SwapMatrix(&Matrix{data: Row(tt.args.b), n: tt.args.matrix.n, m: 1})
+			// fmt.Println("A:", gat, "b:", tmp)
+			// fmt.Println("A:", tt.args.matrix, "b:", tt.args.b)
+
+			got, err := lup.SolveSLAU(tt.args.b)
+			if (err != nil) != tt.wantErr2 {
 				t.Errorf("SolveSLAU() wantErr %v", tt.wantErr2)
 				return
 			}
@@ -314,6 +320,12 @@ func TestSolveSLAU(t *testing.T) {
 			for i := 0; i < lup.n; i++ {
 				if tmp := sumRow(tt.args.matrix, got, i); math.Abs(tmp-tt.args.b[i]) > EPS {
 					t.Errorf("incorrect answer. got: %v, but sum of %d is %f, expected %f", got, i, tmp, -tt.args.b[i])
+
+					// if !matrixEqual(gat, tt.args.matrix, EPS) {
+					// 	t.Errorf("Given:\n%s\nWant:\n%s", gat, tt.args.matrix)
+					// 	t.Error(lup.P)
+					// }
+					// return
 				}
 			}
 			inverse := lup.Inverse()
@@ -327,4 +339,42 @@ func TestSolveSLAU(t *testing.T) {
 	}
 
 	_ = DisplaySLAU{Matrix: EMatrix(3), Coloumn: Coloumn{1, 1, 1}}.String()
+}
+
+func TestLUP_SwapMatrix(t *testing.T) {
+	type fields struct {
+		P []int
+	}
+	type args struct {
+		m *Matrix
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   *Matrix
+	}{
+		{
+			name: "no swap",
+			args: args{
+				m: EMatrix(2),
+			},
+			fields: fields{
+				P: []int{0, 1},
+			},
+			want: EMatrix(2),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			lup := &LUP{
+				P: tt.fields.P,
+			}
+			got := lup.SwapMatrix(tt.args.m, false)
+			if !matrixEqual(got, tt.args.m, EPS) {
+				t.Errorf("Given:\n%s\nWant:\n%s", got, tt.want)
+				t.Error(lup.P)
+			}
+		})
+	}
 }

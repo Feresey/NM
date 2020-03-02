@@ -16,6 +16,7 @@ func TestMatrix_Iterations(t *testing.T) {
 		args           args
 		wantRes        Coloumn
 		wantIterations int
+		wantErr        bool
 	}{
 		{
 			name: "simple",
@@ -74,9 +75,6 @@ func TestMatrix_Iterations(t *testing.T) {
 			wantIterations: 31,
 		},
 		{
-			name: "nil",
-		},
-		{
 			name: "abort",
 			args: args{
 				col: Coloumn{1, 1, 1},
@@ -94,7 +92,11 @@ func TestMatrix_Iterations(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, gotIterations := Iterations(tt.Matrix, tt.args.col, tt.args.eps)
+			gotRes, gotIterations, err := Iterations(tt.Matrix, tt.args.col, tt.args.eps)
+			if (err != nil) != tt.wantErr {
+				t.Error("Error: ", err)
+				return
+			}
 			for idx := range gotRes {
 				if math.Abs(gotRes[idx]-tt.wantRes[idx]) > tt.args.eps {
 					t.Errorf("Matrix.Iterations() gotRes = %v, want %v, iterations: %d", gotRes, tt.wantRes, gotIterations)

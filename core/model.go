@@ -1,5 +1,13 @@
 package core
 
+import "errors"
+
+var (
+	IncorrectColoumn = errors.New("Размерность столбца не совпадает")
+
+	EPS = 1e-9
+)
+
 type (
 	Row     []float64
 	Coloumn []float64
@@ -19,7 +27,8 @@ type DisplaySLAU struct {
 }
 
 type LUP struct {
-	L, U, P *Matrix
-
+	L, U *Matrix
+	// индексы перестановок
+	P    []int
 	n, m int
 }
