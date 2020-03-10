@@ -17,31 +17,32 @@ func TestRotations(t *testing.T) {
 		wantIterations int
 		wantErr        bool
 	}{
-		// {
-		// 	name: "simple",
-		// 	args: args{
-		// 		matrix: &Matrix{
-		// 			data: Row{
-		// 				4, 2, 1,
-		// 				2, 5, 3,
-		// 				1, 3, 6,
-		// 			},
-		// 			m: 3,
-		// 			n: 3,
-		// 		},
-		// 		eps: 0.3,
-		// 	},
-		// 	wantSv: &Matrix{
-		// 		data: Row{
-		// 			0.78, -0.5064, 0.361,
-		// 			0.2209, 0.7625, 0.6,
-		// 			-0.58, -0.398, 0.7,
-		// 		},
-		// 		n: 3,
-		// 		m: 3,
-		// 	},
-		// 	wantSz: Coloumn{3.706, 1.929, 9.38},
-		// },
+		{
+			name: "simple",
+			args: args{
+				matrix: &Matrix{
+					data: Row{
+						4, 2, 1,
+						2, 5, 3,
+						1, 3, 6,
+					},
+					m: 3,
+					n: 3,
+				},
+				eps: 0.3,
+			},
+			wantSv: &Matrix{
+				data: Row{
+					0.78, -0.5064, 0.361,
+					0.2209, 0.7625, 0.6,
+					-0.58, -0.398, 0.7,
+				},
+				n: 3,
+				m: 3,
+			},
+			wantSz:         Coloumn{3.706, 1.929, 9.38},
+			wantIterations: 4,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

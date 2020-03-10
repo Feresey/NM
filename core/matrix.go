@@ -47,7 +47,7 @@ func (matrix Matrix) String() string {
 	return b.String()
 }
 
-// ProdMatrix : перемножает матрицы
+// ProdMatrix : перемножает матрицы и возвращает результат перемножения
 func (matrix *Matrix) ProdMatrix(right *Matrix) *Matrix {
 	if matrix.m != right.n {
 		return nil

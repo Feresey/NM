@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"log"
 
 	"github.com/Feresey/NM/core"
 )
@@ -26,16 +27,24 @@ func lab4(r io.Reader) {
 	fmt.Printf("A:\n%s\n", matrix)
 
 	sz, sv, total, err := core.Rotations(matrix, eps)
-	_ = sz
-	_ = sv
-	_ = total
-	_ = err
-	// if x == nil {
-	// 	log.Fatal("Матрица пустая")
-	// }
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	// fmt.Println("Total iterations: ", total)
-	// for idx := range x {
-	// 	fmt.Printf("x%d = %f\n", idx+1, x[idx])
-	// }
+	fmt.Println("Количество итераций :", total)
+	fmt.Println("\nСобственные значения:")
+	for idx := range sz {
+		fmt.Printf("sz%d = %f\n", idx+1, sz[idx])
+	}
+
+	fmt.Println("\nСобственные векторы:")
+	vectors := core.Transponse(sv)
+	for i := 0; i < n; i++ {
+		fmt.Printf("x%d = (", i)
+		for j := 0; j < n; j++ {
+			fmt.Printf("%7.2f", vectors.Get(i, j))
+		}
+		fmt.Println(")")
+
+	}
 }

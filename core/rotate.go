@@ -9,7 +9,7 @@ func getMaxAbsElem(m *Matrix) (int, int) {
 		i   = -1
 		j   = -1
 	)
-	for line := 1; line < m.n; line++ {
+	for line := 0; line < m.n; line++ {
 		lineIter := line * m.m
 		for col := line + 1; col < m.m; col++ {
 			if tmp := math.Abs(m.data[lineIter+col]); tmp > max {
@@ -29,8 +29,29 @@ func getPhi(a_ii, a_ij, a_jj float64) float64 {
 	return 0.5 * math.Atan(2*a_ij/(a_ii-a_jj))
 }
 
+func getOrt(m *Matrix, i, j int) *Matrix {
+	var (
+		U     = EMatrix(m.n)
+		lineI = i * U.m
+		lineJ = j * U.m
+		phi   = getPhi(
+			m.data[lineI+i],
+			m.data[lineI+j],
+			m.data[lineJ+j])
+		sin = math.Sin(phi)
+		cos = math.Cos(phi)
+	)
+
+	U.data[lineI+j] = -sin
+	U.data[lineJ+i] = sin
+	U.data[lineI+i] = cos
+	U.data[lineJ+j] = cos
+
+	return U
+}
+
 func getSquareSum(m *Matrix) (sum float64) {
-	for line := 1; line < m.n; line++ {
+	for line := 0; line < m.n; line++ {
 		lineIter := line * m.m
 		for col := line + 1; col < m.m; col++ {
 			elem := m.data[lineIter+col]
@@ -40,43 +61,28 @@ func getSquareSum(m *Matrix) (sum float64) {
 	return math.Sqrt(sum)
 }
 
-func Rotations(matrix *Matrix, eps float64) (sz Coloumn, sv *Matrix, iterations int, err error) {
+func Rotations(matrix *Matrix, eps float64) (sz Coloumn, final *Matrix, iterations int, err error) {
 	if matrix.n != matrix.m {
 		err = IncorrectColoumn
 		return
 	}
-	sv = EMatrix(matrix.n)
 	sz = make(Coloumn, 0, matrix.n)
+	final = EMatrix(matrix.n)
 	matrix = matrix.Copy()
 
 	for {
 		iterations++
-		var (
-			U    = EMatrix(matrix.n)
-			i, j = getMaxAbsElem(matrix)
-		)
-		if i == -1 || j == -1 {
-			return
-		}
-		var (
-			lineI = i * U.m
-			lineJ = j * U.m
+		i, j := getMaxAbsElem(matrix)
+		// if i == -1 || j == -1 {
+		// 	return
+		// }
+		U := getOrt(matrix, i, j)
 
-			phi = getPhi(
-				matrix.data[lineI+i],
-				matrix.data[lineI+j],
-				matrix.data[lineJ+j])
-			sin = math.Sin(phi)
-			cos = math.Cos(phi)
-		)
-		U.data[lineI+j] = -sin
-		U.data[lineJ+i] = sin
-		U.data[lineI+i] = cos
-		U.data[lineJ+j] = cos
+		final = final.ProdMatrix(U)
 
 		U_T := Transponse(U)
 		matrix = U_T.ProdMatrix(matrix.ProdMatrix(U))
-		sv = sv.ProdMatrix(U)
+		// sv = sv.ProdMatrix(U)
 
 		if getSquareSum(matrix) < eps {
 			break
