@@ -47,6 +47,7 @@ func Iterations(matrix *Matrix, col Coloumn, eps float64) (res Coloumn, iteratio
 
 		line += matrix.m
 	}
+
 	if matrix.norm() > 1 {
 		return
 	}

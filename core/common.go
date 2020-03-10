@@ -1,9 +1,9 @@
 package core
 
 // NewMatrix : create a new matrix
-func NewMatrix(N, M int) *Matrix {
-	res := &Matrix{n: N, m: M}
-	res.data = make(Row, N*M)
+func NewMatrix(n, m int) *Matrix {
+	res := &Matrix{n: n, m: m}
+	res.data = make(Row, n*m)
 
 	return res
 }

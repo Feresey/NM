@@ -1,6 +1,9 @@
 package core
 
-import "math"
+import (
+	"errors"
+	"math"
+)
 
 // getMaxAbsElem : возвращает индексы максимального по абсолютному значению элемента верхнего треугольника матрицы
 func getMaxAbsElem(m *Matrix) (int, int) {
@@ -61,28 +64,28 @@ func getSquareSum(m *Matrix) (sum float64) {
 	return math.Sqrt(sum)
 }
 
-func Rotations(matrix *Matrix, eps float64) (sz Coloumn, final *Matrix, iterations int, err error) {
+func Rotations(matrix *Matrix, eps float64) (sz Coloumn, sv *Matrix, iterations int, err error) {
 	if matrix.n != matrix.m {
 		err = IncorrectColoumn
 		return
 	}
-	sz = make(Coloumn, 0, matrix.n)
-	final = EMatrix(matrix.n)
+
 	matrix = matrix.Copy()
+	sz = make(Coloumn, 0, matrix.n)
+	sv = EMatrix(matrix.n)
 
 	for {
 		iterations++
 		i, j := getMaxAbsElem(matrix)
-		// if i == -1 || j == -1 {
-		// 	return
-		// }
+		if i == -1 || j == -1 {
+			return nil, nil, iterations, errors.New("Вырожденная матрица")
+		}
 		U := getOrt(matrix, i, j)
 
-		final = final.ProdMatrix(U)
+		sv = sv.ProdMatrix(U)
 
 		U_T := Transponse(U)
 		matrix = U_T.ProdMatrix(matrix.ProdMatrix(U))
-		// sv = sv.ProdMatrix(U)
 
 		if getSquareSum(matrix) < eps {
 			break
