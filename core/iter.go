@@ -31,19 +31,14 @@ func norm(data []float64) (res float64) {
 	return
 }
 
-func Iterations(matrix *Matrix, col Coloumn, eps float64) (Coloumn, int, error) {
-	if matrix.n != matrix.m {
-		return nil, 0, IncorrectColoumn
-	}
-
+func makeEquivalent(m *Matrix, col Coloumn) (*Matrix, Coloumn) {
 	var (
-		beta = make(Coloumn, len(col))
-		line = 0
+		matrix = m.Copy()
+		line   = 0
+		beta   = make(Coloumn, len(col))
 	)
 
 	copy(beta, col)
-
-	matrix = matrix.Copy()
 
 	for i := 0; i < matrix.n; i++ {
 		div := matrix.data[line+i]
@@ -57,7 +52,17 @@ func Iterations(matrix *Matrix, col Coloumn, eps float64) (Coloumn, int, error) 
 		line += matrix.m
 	}
 
-	if matrix.norm() > 1 {
+	return matrix, beta
+}
+
+func Iterations(matrix *Matrix, col Coloumn, eps float64) (Coloumn, int, error) {
+	if matrix.n != matrix.m {
+		return nil, 0, IncorrectColoumn
+	}
+
+	m, beta := makeEquivalent(matrix, col)
+
+	if m.norm() > 1 {
 		return nil, 0, errors.New("матрица не сходится по методу итераций")
 	}
 
@@ -73,12 +78,14 @@ func Iterations(matrix *Matrix, col Coloumn, eps float64) (Coloumn, int, error) 
 	for math.Abs(prevNorm-currNorm) > eps {
 		iterations++
 
-		curr := make(Coloumn, len(res))
-		idx := 0
+		var (
+			curr = make(Coloumn, len(res))
+			idx  = 0
+		)
 
-		for line := 0; line < len(matrix.data); line += matrix.m {
-			for i := 0; i < matrix.m; i++ {
-				curr[idx] += matrix.data[line+i] * res[i]
+		for line := 0; line < len(m.data); line += m.m {
+			for i := 0; i < m.m; i++ {
+				curr[idx] += m.data[line+i] * res[i]
 			}
 
 			curr[idx] += beta[idx]
