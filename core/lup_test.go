@@ -99,7 +99,7 @@ func TestMatrix_LUDecomposition(t *testing.T) {
 			}
 			got := lup.SwapMatrix(lup.L.ProdMatrix(lup.U), false)
 
-			if !matrixEqual(got, &tt.Matrix, EPS) {
+			if !matrixEqual(got, &tt.Matrix, eps) {
 				t.Errorf("Given:\n%s\nWant:\n%s", got, tt.Matrix)
 				// t.Error(lup.P)
 			}
@@ -318,7 +318,7 @@ func TestSolveSLAU(t *testing.T) {
 				return
 			}
 			for i := 0; i < lup.n; i++ {
-				if tmp := sumRow(tt.args.matrix, got, i); math.Abs(tmp-tt.args.b[i]) > EPS {
+				if tmp := sumRow(tt.args.matrix, got, i); math.Abs(tmp-tt.args.b[i]) > eps {
 					t.Errorf("incorrect answer. got: %v, but sum of %d is %f, expected %f", got, i, tmp, -tt.args.b[i])
 
 					// if !matrixEqual(gat, tt.args.matrix, EPS) {
@@ -329,10 +329,10 @@ func TestSolveSLAU(t *testing.T) {
 				}
 			}
 			inverse := lup.Inverse()
-			if !matrixEqual(tt.args.matrix.ProdMatrix(inverse), EMatrix(tt.args.matrix.n), EPS) {
+			if !matrixEqual(tt.args.matrix.ProdMatrix(inverse), EMatrix(tt.args.matrix.n), eps) {
 				t.Error("Inverse matrix does not correct")
 			}
-			if tmp := lup.Determinant(); math.Abs(tt.det-tmp) > EPS {
+			if tmp := lup.Determinant(); math.Abs(tt.det-tmp) > eps {
 				t.Errorf("Incorrect det. got: %f, expected: %f", tmp, tt.det)
 			}
 		})
@@ -345,9 +345,11 @@ func TestLUP_SwapMatrix(t *testing.T) {
 	type fields struct {
 		P []int
 	}
+
 	type args struct {
 		m *Matrix
 	}
+
 	tests := []struct {
 		name   string
 		fields fields
@@ -371,7 +373,7 @@ func TestLUP_SwapMatrix(t *testing.T) {
 				P: tt.fields.P,
 			}
 			got := lup.SwapMatrix(tt.args.m, false)
-			if !matrixEqual(got, tt.args.m, EPS) {
+			if !matrixEqual(got, tt.args.m, eps) {
 				t.Errorf("Given:\n%s\nWant:\n%s", got, tt.want)
 				t.Error(lup.P)
 			}

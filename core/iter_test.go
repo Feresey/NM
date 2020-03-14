@@ -10,6 +10,7 @@ func TestMatrix_Iterations(t *testing.T) {
 		col Coloumn
 		eps float64
 	}
+
 	tests := []struct {
 		name string
 		*Matrix
@@ -88,9 +89,13 @@ func TestMatrix_Iterations(t *testing.T) {
 				m: 3,
 				n: 3,
 			},
+			wantErr: true,
 		},
 	}
+
 	for _, tt := range tests {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
 			gotRes, gotIterations, err := Iterations(tt.Matrix, tt.args.col, tt.args.eps)
 			if (err != nil) != tt.wantErr {
@@ -130,7 +135,10 @@ func TestMatrix_norm(t *testing.T) {
 			wantRes: 1,
 		},
 	}
+
 	for _, tt := range tests {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
 			if gotRes := tt.Matrix.norm(); gotRes != tt.wantRes {
 				t.Errorf("Matrix.norm() = %v, want %v", gotRes, tt.wantRes)
@@ -151,7 +159,10 @@ func Test_norm(t *testing.T) {
 			wantRes: 4,
 		},
 	}
+
 	for _, tt := range tests {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
 			if gotRes := norm(tt.data); gotRes != tt.wantRes {
 				t.Errorf("norm() = %v, want %v", gotRes, tt.wantRes)

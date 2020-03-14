@@ -39,12 +39,12 @@ func lab4(r io.Reader) {
 
 	fmt.Println("\nСобственные векторы:")
 	vectors := core.Transponse(sv)
+
 	for i := 0; i < n; i++ {
 		fmt.Printf("x%d = (", i)
 		for j := 0; j < n; j++ {
 			fmt.Printf("%7.2f", vectors.Get(i, j))
 		}
 		fmt.Println(")")
-
 	}
 }

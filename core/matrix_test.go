@@ -18,6 +18,7 @@ func floatEqual(a, b []float64, eps float64) bool {
 			return false
 		}
 	}
+
 	return true
 }
 
@@ -142,7 +143,7 @@ func TestMatrix_ProdMatrix(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := tt.Matrix.ProdMatrix(&tt.arg)
 
-			if !tt.wantErr && !matrixEqual(got, &tt.want, EPS) {
+			if !tt.wantErr && !matrixEqual(got, &tt.want, eps) {
 				t.Errorf("Given:\n%s\nWant:\n%s", got, tt.want)
 			}
 		})
@@ -221,7 +222,7 @@ func TestMatrix_SwapLines(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.Matrix.SwapLines(tt.arg.a, tt.arg.b)
-			if !matrixEqual(&tt.Matrix, &tt.wantMatrix, EPS) {
+			if !matrixEqual(&tt.Matrix, &tt.wantMatrix, eps) {
 				t.Errorf("Given:\n%s\nWant:\n%s", tt.Matrix, tt.wantMatrix)
 			}
 		})
@@ -374,7 +375,7 @@ func TestMatrix_Set(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.Matrix.Set(tt.args.i, tt.args.j, tt.args.value)
-			if !matrixEqual(&tt.Matrix, &tt.want, EPS) {
+			if !matrixEqual(&tt.Matrix, &tt.want, eps) {
 				t.Errorf("Given:\n%s\nWant:\n%s", tt.Matrix, tt.want)
 			}
 		})

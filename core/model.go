@@ -5,7 +5,7 @@ import "errors"
 var (
 	IncorrectColoumn = errors.New("Размерность столбца не совпадает")
 
-	EPS = 1e-9
+	eps = 1e-9
 )
 
 type (

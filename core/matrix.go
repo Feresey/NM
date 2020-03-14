@@ -6,7 +6,6 @@ import (
 	"strings"
 )
 
-
 // Get : return elem
 func (matrix *Matrix) Get(i, j int) float64 {
 	return matrix.data[i*matrix.m+j]
@@ -24,6 +23,7 @@ func (matrix *Matrix) Copy() *Matrix {
 		n:    matrix.n,
 		m:    matrix.m,
 	}
+
 	copy(res.data, matrix.data)
 
 	return res
@@ -41,6 +41,7 @@ func (matrix Matrix) String() string {
 		for _, val := range matrix.data[line : line+matrix.m] {
 			b.WriteString(fmt.Sprintf("%7.2f", val))
 		}
+
 		b.WriteString("\n")
 	}
 
@@ -52,13 +53,16 @@ func (matrix *Matrix) ProdMatrix(right *Matrix) *Matrix {
 	if matrix.m != right.n {
 		return nil
 	}
+
 	res := NewMatrix(matrix.n, right.m)
 
 	for i := 0; i < matrix.n; i++ {
 		for j := 0; j < right.m; j++ {
-			index := i*res.m + j
-			leftLine := i * matrix.m
-			rightColoumn := j
+			var (
+				index        = i*res.m + j
+				leftLine     = i * matrix.m
+				rightColoumn = j
+			)
 
 			//matrix.m == right.n
 			for k := 0; k < right.n; k++ {
@@ -91,8 +95,9 @@ func (matrix *Matrix) SwapLines(a, b int) {
 func (matrix *Matrix) maxInCol(col, from int) int {
 	var (
 		res = -1
-		max = EPS
+		max = eps
 	)
+	
 	for i := from; i < matrix.n; i++ {
 		if tmp := math.Abs(matrix.data[matrix.m*i+col]); tmp > max {
 			max = tmp

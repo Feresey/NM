@@ -39,7 +39,7 @@ func TestMatrix_RunThrough(t *testing.T) {
 			if (err != nil) != tt.wantErr {
 				t.Error("Error: ", err)
 			}
-			if !floatEqual(got, tt.want, EPS) {
+			if !floatEqual(got, tt.want, eps) {
 				t.Errorf("Matrix.RunThrough() = %v, want %v", got, tt.want)
 			}
 		})

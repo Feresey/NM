@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 )
 
-func prettyPrint(format string, args ...interface{}) {
+func prettyPrintf(format string, args ...interface{}) {
 	data := fmt.Sprintf(format, args...)
 
 	fmt.Print("\n")
@@ -48,6 +48,7 @@ func main() {
 		default:
 			log.Fatal("Нет такой лабораторной: ", labName)
 		}
+
 		path := filepath.Join(testdir, labName)
 		files, err := ioutil.ReadDir(path)
 		if err != nil {
@@ -56,7 +57,7 @@ func main() {
 
 		for _, file := range files {
 			filePath := filepath.Join(path, file.Name())
-			prettyPrint("%s>  %s", labName, filePath)
+			prettyPrintf("%s>  %s", labName, filePath)
 
 			opened, err := os.Open(filePath)
 			if err != nil {

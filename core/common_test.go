@@ -71,11 +71,13 @@ func TestTransponse(t *testing.T) {
 			},
 		},
 	}
+
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			got := Transponse(tt.m)
 
-			if !matrixEqual(got, tt.want, EPS) {
+			if !matrixEqual(got, tt.want, eps) {
 				t.Errorf("L Given:\n%s\nWant:\n%s", got, tt.want)
 			}
 		})

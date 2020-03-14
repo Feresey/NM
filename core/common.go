@@ -24,16 +24,21 @@ func EMatrix(n int) *Matrix {
 }
 
 func Transponse(m *Matrix) *Matrix {
-	res := NewMatrix(m.m, m.n)
+	var (
+		res   = NewMatrix(m.m, m.n)
+		lineM = 0
+	)
 
-	lineM := 0
 	for i := 0; i < m.n; i++ {
 		lineRes := i
+
 		for j := 0; j < m.m; j++ {
 			res.data[lineRes] = m.data[lineM+j]
 			lineRes += m.n
 		}
+
 		lineM += m.m
 	}
+
 	return res
 }
