@@ -3,97 +3,78 @@ package core
 import (
 	"errors"
 	"math"
+
+	"gonum.org/v1/gonum/mat"
 )
 
-func (matrix *Matrix) norm() (res float64) {
-	for line := 0; line < len(matrix.data); line += matrix.m {
-		var max float64
+func makeEquivalent(matrix mat.Matrix, col mat.Vector) (res *mat.Dense, beta *mat.VecDense) {
+	n, m := matrix.Dims()
+	res = mat.NewDense(n, m, nil)
+	beta = mat.NewVecDense(col.Len(), nil)
 
-		for i := 0; i < matrix.m; i++ {
-			max += math.Abs(matrix.data[line+i])
-		}
+	res.Copy(matrix)
+	beta.CopyVec(col)
 
-		if max > res {
-			res = max
-		}
+	for line := 0; line < n; line++ {
+		div := res.At(line, line)
+
+		mLine := res.RowView(line).(*mat.VecDense)
+
+		mLine.ScaleVec(-1, mLine)
+		mLine.ScaleVec(1/div, mLine)
+
+		res.Set(line, line, 0) // диагональ должна быть нулевой
+		beta.SetVec(line, beta.AtVec(line)/div)
 	}
 
-	return
+	return res, beta
 }
 
-func norm(data []float64) (res float64) {
-	for _, val := range data {
-		if max := math.Abs(val); max > res {
-			res = max
-		}
-	}
+func Iterations(
+	matrix mat.Matrix,
+	col mat.Vector,
+	eps float64,
+) (res *mat.VecDense, iterations int, err error) {
+	res = mat.NewVecDense(col.Len(), nil)
+	m, n := matrix.Dims()
 
-	return
-}
-
-func makeEquivalent(m *Matrix, col Coloumn) (*Matrix, Coloumn) {
-	var (
-		matrix = m.Copy()
-		line   = 0
-		beta   = make(Coloumn, len(col))
-	)
-
-	copy(beta, col)
-
-	for i := 0; i < matrix.n; i++ {
-		div := matrix.data[line+i]
-
-		for elem := 0; elem < matrix.m; elem++ {
-			matrix.data[line+elem] = -matrix.data[line+elem] / div
-		}
-
-		matrix.data[line+i] = 0 // диагональ должна быть нулевой
-		beta[i] /= div
-		line += matrix.m
-	}
-
-	return matrix, beta
-}
-
-func Iterations(matrix *Matrix, col Coloumn, eps float64) (Coloumn, int, error) {
-	if matrix.n != matrix.m {
+	if n != m || n != res.Len() {
 		return nil, 0, IncorrectColoumn
 	}
 
-	m, beta := makeEquivalent(matrix, col)
+	eq, beta := makeEquivalent(matrix, col)
 
-	if m.norm() > 1 {
+	alpha := mat.Norm(eq, 1)
+	if alpha > 1 { // обычная линейная норма
 		return nil, 0, errors.New("матрица не сходится по методу итераций")
 	}
 
-	res := make(Coloumn, len(beta))
-	copy(res, beta)
+	res.CopyVec(beta)
 
 	var (
-		prevNorm   = norm(res)
-		currNorm   float64
-		iterations int
+		prevNorm = mat.Norm(res, 2) // среднеквадратичная норма
+		currNorm float64
 	)
 
 	for math.Abs(prevNorm-currNorm) > eps {
 		iterations++
 
 		var (
-			curr = make(Coloumn, len(res))
-			idx  = 0
+			curr = mat.NewVecDense(res.Len(), nil)
+			idx  int
 		)
 
-		for line := 0; line < len(m.data); line += m.m {
-			for i := 0; i < m.m; i++ {
-				curr[idx] += m.data[line+i] * res[i]
+		for line := 0; line < n; line++ {
+			for i := 0; i < m; i++ {
+				curr.SetVec(idx, curr.AtVec(idx)+eq.At(line, i)*res.AtVec(i))
 			}
 
-			curr[idx] += beta[idx]
+			curr.SetVec(idx, curr.AtVec(idx)+beta.AtVec(idx))
 			idx++
 		}
 
 		res = curr
-		prevNorm, currNorm = currNorm, norm(res)
+		prevNorm, currNorm = currNorm, mat.Norm(res, 2)
 	}
 
 	return res, iterations, nil

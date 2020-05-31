@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math"
 	"strings"
+
+	"gonum.org/v1/gonum/mat"
 )
 
 // Get : return elem
@@ -32,6 +34,22 @@ func (matrix *Matrix) Copy() *Matrix {
 // GetSize : return sizes
 func (matrix *Matrix) GetSize() (rows, coloumns int) {
 	return matrix.n, matrix.m
+}
+
+func StringMatrix(matrix mat.Matrix) string {
+	b := strings.Builder{}
+
+	n, m := matrix.Dims()
+
+	for line := 0; line < n; line++ {
+		for col := 0; col < m; col++ {
+			b.WriteString(fmt.Sprintf("%10.5f", matrix.At(line, col)))
+		}
+
+		b.WriteString("\n")
+	}
+
+	return b.String()
 }
 
 func (matrix Matrix) String() string {
@@ -97,7 +115,7 @@ func (matrix *Matrix) maxInCol(col, from int) int {
 		res = -1
 		max = eps
 	)
-	
+
 	for i := from; i < matrix.n; i++ {
 		if tmp := math.Abs(matrix.data[matrix.m*i+col]); tmp > max {
 			max = tmp

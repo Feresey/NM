@@ -1,8 +1,10 @@
 package core
 
 import (
-	"math"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"gonum.org/v1/gonum/mat"
 )
 
 func TestMatrix_Iterations(t *testing.T) {
@@ -34,7 +36,7 @@ func TestMatrix_Iterations(t *testing.T) {
 				m: 3,
 				n: 3,
 			},
-			wantIterations: 4,
+			wantIterations: 5,
 			wantRes:        Coloumn{1, 1, 1},
 		},
 		{
@@ -73,7 +75,7 @@ func TestMatrix_Iterations(t *testing.T) {
 				eps: 1e-9,
 			},
 			wantRes:        Coloumn{4, 2, -7, 9},
-			wantIterations: 31,
+			wantIterations: 30,
 		},
 		{
 			name: "abort",
@@ -96,77 +98,87 @@ func TestMatrix_Iterations(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 
-		t.Run(tt.name, func(t *testing.T) {
-			gotRes, gotIterations, err := Iterations(tt.Matrix, tt.args.col, tt.args.eps)
-			if (err != nil) != tt.wantErr {
-				t.Error("Error: ", err)
+		t.Run(tt.name, func(ttt *testing.T) {
+			t := assert.New(ttt)
+
+			gotRes, gotIterations, err := Iterations(
+				mat.NewDense(tt.n, tt.m, tt.Matrix.data),
+				mat.NewVecDense(tt.n, tt.args.col),
+				tt.args.eps,
+			)
+			if !t.Equal(tt.wantErr, err != nil, "Err: %v, test: %s", err, tt.name) {
 				return
 			}
-			for idx := range gotRes {
-				if math.Abs(gotRes[idx]-tt.wantRes[idx]) > tt.args.eps {
-					t.Errorf("Matrix.Iterations() gotRes = %v, want %v, iterations: %d", gotRes, tt.wantRes, gotIterations)
-					return
-				}
+			if err != nil {
+				return
 			}
-			if gotIterations != tt.wantIterations {
-				t.Errorf("Matrix.Iterations() gotIterations = %v, want %v", gotIterations, tt.wantIterations)
-			}
-		})
-	}
-}
 
-func TestMatrix_norm(t *testing.T) {
-	tests := []struct {
-		name string
-		Matrix
-		wantRes float64
-	}{
-		{
-			name: "simple",
-			Matrix: Matrix{
-				data: Row{
-					1, 0, 0,
-					0, 1, 0,
-					0, 0, -1,
-				},
-				m: 3,
-				n: 3,
-			},
-			wantRes: 1,
-		},
-	}
+			t.Equal(tt.wantIterations, gotIterations, gotRes)
 
-	for _, tt := range tests {
-		tt := tt
-
-		t.Run(tt.name, func(t *testing.T) {
-			if gotRes := tt.Matrix.norm(); gotRes != tt.wantRes {
-				t.Errorf("Matrix.norm() = %v, want %v", gotRes, tt.wantRes)
+			if !t.InEpsilonSlice(
+				tt.wantRes,
+				gotRes.RawVector().Data,
+				tt.args.eps,
+				gotRes,
+			) {
+				return
 			}
 		})
 	}
 }
 
-func Test_norm(t *testing.T) {
-	tests := []struct {
-		name    string
-		data    []float64
-		wantRes float64
-	}{
-		{
-			name:    "simple",
-			data:    []float64{1, 2, -1, 3, 4, 0},
-			wantRes: 4,
-		},
-	}
+// func TestMatrix_norm(t *testing.T) {
+// 	tests := []struct {
+// 		name string
+// 		Matrix
+// 		wantRes float64
+// 	}{
+// 		{
+// 			name: "simple",
+// 			Matrix: Matrix{
+// 				data: Row{
+// 					1, 0, 0,
+// 					0, 1, 0,
+// 					0, 0, -1,
+// 				},
+// 				m: 3,
+// 				n: 3,
+// 			},
+// 			wantRes: 1,
+// 		},
+// 	}
 
-	for _, tt := range tests {
-		tt := tt
+// 	for _, tt := range tests {
+// 		tt := tt
 
-		t.Run(tt.name, func(t *testing.T) {
-			if gotRes := norm(tt.data); gotRes != tt.wantRes {
-				t.Errorf("norm() = %v, want %v", gotRes, tt.wantRes)
-			}
-		})
-	}
-}
+// 		t.Run(tt.name, func(t *testing.T) {
+// 			if gotRes := tt.Matrix.norm(); gotRes != tt.wantRes {
+// 				t.Errorf("Matrix.norm() = %v, want %v", gotRes, tt.wantRes)
+// 			}
+// 		})
+// 	}
+// }
+
+// func Test_norm(t *testing.T) {
+// 	tests := []struct {
+// 		name    string
+// 		data    []float64
+// 		wantRes float64
+// 	}{
+// 		{
+// 			name:    "simple",
+// 			data:    []float64{1, 2, -1, 3, 4, 0},
+// 			wantRes: 4,
+// 		},
+// 	}
+
+// 	for _, tt := range tests {
+// 		tt := tt
+
+// 		t.Run(tt.name, func(t *testing.T) {
+// 			if gotRes := norm(tt.data); gotRes != tt.wantRes {
+// 				t.Errorf("norm() = %v, want %v", gotRes, tt.wantRes)
+// 			}
+// 		})
+// 	}
+// }
