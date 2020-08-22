@@ -24,9 +24,21 @@ func lab3(r io.Reader) {
 	fscan(r, &eps)
 	fscan(r, &n)
 	matrix, b := readSLAU(r, n)
-	fmt.Printf("A:\n%s\n", core.DisplaySLAU{Matrix: matrix, Coloumn: b})
+	fmt.Printf("A:\n%s\n", core.DisplaySLAU(matrix, b))
 
+	fmt.Println("Iterations:")
 	x, total, err := core.Iterations(matrix, b, eps)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Total iterations: ", total)
+	for idx := range x {
+		fmt.Printf("x%d = %f\n", idx+1, x[idx])
+	}
+
+	fmt.Println("Zeidel:")
+	x, total, err = core.Zeidel(matrix, b, eps)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -2,9 +2,14 @@ package core
 
 import (
 	"errors"
-	"fmt"
-	"strings"
 )
+
+type LUP struct {
+	L, U *Matrix
+	// индексы перестановок
+	P    []int
+	n, m int
+}
 
 // LUDecomposition : Разделяет матрицу на три:
 // L - нижнетреугольную с еденицами на главной диогонали
@@ -176,21 +181,4 @@ func (lup *LUP) SwapMatrix(m *Matrix, reverse bool) *Matrix {
 	}
 
 	return res
-}
-
-func (d DisplaySLAU) String() string {
-	b := strings.Builder{}
-
-	for i := 0; i < d.n; i++ {
-		line := i * d.m
-		b.WriteString(fmt.Sprintf("%6.2f*x%d", d.data[line], 1))
-
-		for j := 1; j < d.m; j++ {
-			b.WriteString(fmt.Sprintf(" +%6.2f*x%d", d.data[line+j], j+1))
-		}
-
-		b.WriteString(fmt.Sprintf(" = %6.2f\n", d.Coloumn[i]))
-	}
-
-	return b.String()
 }

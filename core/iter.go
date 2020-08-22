@@ -23,22 +23,21 @@ func (matrix *Matrix) norm() (res float64) {
 
 func norm(data []float64) (res float64) {
 	for _, val := range data {
-		if max := math.Abs(val); max > res {
-			res = max
-		}
+		res += val * val
+		// if max := math.Abs(val); max > res {
+		// 	res = max
+		// }
 	}
 
-	return
+	return math.Sqrt(res)
 }
 
 func makeEquivalent(m *Matrix, col Coloumn) (*Matrix, Coloumn) {
 	var (
 		matrix = m.Copy()
 		line   = 0
-		beta   = make(Coloumn, len(col))
+		beta   = col.Copy()
 	)
-
-	copy(beta, col)
 
 	for i := 0; i < matrix.n; i++ {
 		div := matrix.data[line+i]
@@ -66,8 +65,7 @@ func Iterations(matrix *Matrix, col Coloumn, eps float64) (Coloumn, int, error) 
 		return nil, 0, errors.New("матрица не сходится по методу итераций")
 	}
 
-	res := make(Coloumn, len(beta))
-	copy(res, beta)
+	res := beta.Copy()
 
 	var (
 		prevNorm   = norm(res)
@@ -90,6 +88,44 @@ func Iterations(matrix *Matrix, col Coloumn, eps float64) (Coloumn, int, error) 
 
 			curr[idx] += beta[idx]
 			idx++
+		}
+
+		res = curr
+		prevNorm, currNorm = currNorm, norm(res)
+	}
+
+	return res, iterations, nil
+}
+
+func Zeidel(matrix *Matrix, col Coloumn, eps float64) (Coloumn, int, error) {
+	if matrix.n != matrix.m {
+		return nil, 0, IncorrectColoumn
+	}
+
+	m, beta := makeEquivalent(matrix, col)
+
+	if m.norm() > 1 {
+		return nil, 0, errors.New("матрица не сходится по методу итераций")
+	}
+
+	res := beta.Copy()
+
+	var (
+		prevNorm   = norm(res)
+		currNorm   float64
+		iterations int
+	)
+
+	for ; math.Abs(prevNorm-currNorm) > eps; iterations++ {
+		curr := beta.Copy()
+
+		for i := 0; i < m.n; i++ {
+			for j := 0; j < i; j++ {
+				curr[i] += curr[j] * m.At(i, j)
+			}
+			for j := i; j < m.m; j++ {
+				curr[i] += res[j] * m.At(i, j)
+			}
 		}
 
 		res = curr

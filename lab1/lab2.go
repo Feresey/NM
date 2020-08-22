@@ -25,7 +25,7 @@ func lab2(r io.Reader) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("A:\n%s\n", core.DisplaySLAU{Matrix: matrix, Coloumn: b})
+	fmt.Printf("A:\n%s\n", core.DisplaySLAU(matrix, b))
 
 	for idx := range x {
 		fmt.Printf("x%d = %f\n", idx+1, x[idx])

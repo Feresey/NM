@@ -337,8 +337,6 @@ func TestSolveSLAU(t *testing.T) {
 			}
 		})
 	}
-
-	_ = DisplaySLAU{Matrix: EMatrix(3), Coloumn: Coloumn{1, 1, 1}}.String()
 }
 
 func TestLUP_SwapMatrix(t *testing.T) {

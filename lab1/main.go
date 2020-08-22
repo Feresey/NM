@@ -8,22 +8,13 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func prettyPrintf(format string, args ...interface{}) {
 	data := fmt.Sprintf(format, args...)
-
-	fmt.Print("\n")
-	for i := 0; i < len(data); i++ {
-		fmt.Print("=")
-	}
-	fmt.Print("\n")
-	fmt.Print(data)
-	fmt.Print("\n")
-	for i := 0; i < len(data); i++ {
-		fmt.Print("=")
-	}
-	fmt.Print("\n\n")
+	line := "\n" + strings.Repeat("=", len(data)) + "\n"
+	fmt.Printf("%s%s%s\n", line, data, line)
 }
 
 func main() {
@@ -61,8 +52,7 @@ func main() {
 
 			opened, err := os.Open(filePath)
 			if err != nil {
-				log.Print("Error opening file: ", err)
-				continue
+				log.Fatal("Error opening file: ", err)
 			}
 			f(opened)
 		}

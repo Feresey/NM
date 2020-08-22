@@ -1,8 +1,9 @@
 package core
 
 import (
-	"math"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestMatrix_Iterations(t *testing.T) {
@@ -14,10 +15,9 @@ func TestMatrix_Iterations(t *testing.T) {
 	tests := []struct {
 		name string
 		*Matrix
-		args           args
-		wantRes        Coloumn
-		wantIterations int
-		wantErr        bool
+		args    args
+		wantRes Coloumn
+		wantErr bool
 	}{
 		{
 			name: "simple",
@@ -34,8 +34,7 @@ func TestMatrix_Iterations(t *testing.T) {
 				m: 3,
 				n: 3,
 			},
-			wantIterations: 4,
-			wantRes:        Coloumn{1, 1, 1},
+			wantRes: Coloumn{1, 1, 1},
 		},
 		{
 			name: "big",
@@ -53,8 +52,7 @@ func TestMatrix_Iterations(t *testing.T) {
 				col: Coloumn{38, -195, -27, 142},
 				eps: 1e-9,
 			},
-			wantRes:        Coloumn{-1, -6, -2, 8},
-			wantIterations: 19,
+			wantRes: Coloumn{-1, -6, -2, 8},
 		},
 		{
 			name: "big",
@@ -72,8 +70,7 @@ func TestMatrix_Iterations(t *testing.T) {
 				col: Coloumn{-9, -76, -79, -70},
 				eps: 1e-9,
 			},
-			wantRes:        Coloumn{4, 2, -7, 9},
-			wantIterations: 31,
+			wantRes: Coloumn{4, 2, -7, 9},
 		},
 		{
 			name: "abort",
@@ -96,21 +93,22 @@ func TestMatrix_Iterations(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 
-		t.Run(tt.name, func(t *testing.T) {
-			gotRes, gotIterations, err := Iterations(tt.Matrix, tt.args.col, tt.args.eps)
-			if (err != nil) != tt.wantErr {
-				t.Error("Error: ", err)
-				return
+		t.Run(tt.name+".iter", func(t *testing.T) {
+			gotIterations, _, err := Iterations(tt.Matrix, tt.args.col, tt.args.eps)
+			if tt.wantErr {
+				require.Error(t, err)
 			}
-			for idx := range gotRes {
-				if math.Abs(gotRes[idx]-tt.wantRes[idx]) > tt.args.eps {
-					t.Errorf("Matrix.Iterations() gotRes = %v, want %v, iterations: %d", gotRes, tt.wantRes, gotIterations)
-					return
-				}
+
+			require.InEpsilonSlice(t, tt.wantRes, gotIterations, tt.args.eps)
+		})
+
+		t.Run(tt.name+".zeidel", func(t *testing.T) {
+			gotZeidel, _, err := Zeidel(tt.Matrix, tt.args.col, tt.args.eps)
+			if tt.wantErr {
+				require.Error(t, err)
 			}
-			if gotIterations != tt.wantIterations {
-				t.Errorf("Matrix.Iterations() gotIterations = %v, want %v", gotIterations, tt.wantIterations)
-			}
+
+			require.InEpsilonSlice(t, tt.wantRes, gotZeidel, tt.args.eps)
 		})
 	}
 }
@@ -142,30 +140,6 @@ func TestMatrix_norm(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if gotRes := tt.Matrix.norm(); gotRes != tt.wantRes {
 				t.Errorf("Matrix.norm() = %v, want %v", gotRes, tt.wantRes)
-			}
-		})
-	}
-}
-
-func Test_norm(t *testing.T) {
-	tests := []struct {
-		name    string
-		data    []float64
-		wantRes float64
-	}{
-		{
-			name:    "simple",
-			data:    []float64{1, 2, -1, 3, 4, 0},
-			wantRes: 4,
-		},
-	}
-
-	for _, tt := range tests {
-		tt := tt
-
-		t.Run(tt.name, func(t *testing.T) {
-			if gotRes := norm(tt.data); gotRes != tt.wantRes {
-				t.Errorf("norm() = %v, want %v", gotRes, tt.wantRes)
 			}
 		})
 	}
