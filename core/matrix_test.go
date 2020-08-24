@@ -2,6 +2,8 @@ package core
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func matrixEqual(a, b *Matrix, eps float64) bool {
@@ -152,7 +154,7 @@ func TestMatrix_ProdMatrix(t *testing.T) {
 	if tests[0].arg.String() == "" {
 		t.Error("oops")
 	}
-	if n, m := tests[0].arg.GetSize(); n == 0 || m == 0 {
+	if n, m := tests[0].arg.Dims(); n == 0 || m == 0 {
 		t.Error("oops")
 	}
 }
@@ -498,6 +500,42 @@ func TestTransponse(t *testing.T) {
 			if !matrixEqual(got, tt.want, eps) {
 				t.Errorf("L Given:\n%s\nWant:\n%s", got, tt.want)
 			}
+		})
+	}
+}
+
+func TestMatrix_Inverse(t *testing.T) {
+	tests := []struct {
+		name string
+		data *Matrix
+		want *Matrix
+	}{
+		{
+			name: "simple",
+			data: &Matrix{
+				data: []float64{
+					7, 4,
+					5, 3,
+				},
+				n: 2,
+				m: 2,
+			},
+			want: &Matrix{
+				data: []float64{
+					3, -4,
+					-5, 7,
+				},
+				n: 2,
+				m: 2,
+			},
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			inv, err := tt.data.Inverse()
+			require.NoError(t, err)
+			require.InEpsilonSlice(t, tt.want.data, inv.data, 1e-9)
 		})
 	}
 }

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"math"
 	"strings"
+
+	"gonum.org/v1/gonum/mat"
 )
 
 var (
@@ -85,8 +87,8 @@ func EMatrix(n int) *Matrix {
 	return E
 }
 
-// GetSize : return sizes
-func (matrix *Matrix) GetSize() (rows, coloumns int) {
+// Dims : return sizes
+func (matrix *Matrix) Dims() (rows, coloumns int) {
 	return matrix.n, matrix.m
 }
 
@@ -102,6 +104,10 @@ func (matrix Matrix) String() string {
 	}
 
 	return b.String()
+}
+
+func (matrix *Matrix) T() mat.Matrix {
+	return Transponse(matrix)
 }
 
 func Transponse(m *Matrix) *Matrix {
@@ -141,6 +147,12 @@ func DisplaySLAU(m *Matrix, col Coloumn) string {
 	return b.String()
 }
 
+func (matrix *Matrix) ProdNum(num float64) {
+	for i := 0; i < len(matrix.data); i++ {
+		matrix.data[i] *= num
+	}
+}
+
 // ProdMatrix : перемножает матрицы и возвращает результат перемножения
 func (matrix *Matrix) ProdMatrix(right *Matrix) *Matrix {
 	if matrix.m != right.n {
@@ -166,6 +178,36 @@ func (matrix *Matrix) ProdMatrix(right *Matrix) *Matrix {
 	}
 
 	return res
+}
+
+func (matrix *Matrix) Add(m *Matrix) {
+	for i := 0; i < len(matrix.data); i++ {
+		matrix.data[i] += m.data[i]
+	}
+}
+
+func (matrix *Matrix) Sub(m *Matrix) {
+	for i := 0; i < len(matrix.data); i++ {
+		matrix.data[i] -= m.data[i]
+	}
+}
+
+func (matrix *Matrix) Inverse() (*Matrix, error) {
+	var d mat.Dense
+	err := d.Inverse(matrix)
+	if err != nil {
+		return nil, err
+	}
+
+	res := matrix.Copy()
+	n, m := d.Dims()
+	for i := 0; i < n; i++ {
+		for j := 0; j < m; j++ {
+			res.Set(i, j, d.At(i, j))
+		}
+	}
+
+	return res, nil
 }
 
 // SwapLines : swap lines a and b
