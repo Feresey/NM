@@ -36,6 +36,7 @@ func main() {
 		case "lab4":
 			f = lab4
 		case "lab5":
+			f = lab5
 		default:
 			log.Fatal("Нет такой лабораторной: ", labName)
 		}

@@ -1,11 +1,8 @@
 package core
 
 import (
-	"fmt"
 	"math"
 	"math/cmplx"
-
-	"gonum.org/v1/gonum/mat"
 )
 
 func sign(num float64) float64 {
@@ -98,8 +95,8 @@ func getEigenvalue(A *Matrix, eps float64, i int, iter *int) ([]complex128, erro
 
 		// fmt.Printf("Q%d:\n%v\n", *iter, mat.Formatted(Q))
 		// fmt.Printf("R%d:\n%v\n", *iter, mat.Formatted(R))
-		fmt.Printf("A%d:\n%v\n", *iter+1, mat.Formatted(A))
-		fmt.Println()
+		// fmt.Printf("A%d:\n%v\n", *iter+1, mat.Formatted(A))
+		// fmt.Println()
 
 		*iter++
 
