@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/Feresey/NM/core"
+	"gonum.org/v1/gonum/mat"
 )
 
 /*
@@ -36,4 +37,11 @@ func lab5(r io.Reader) {
 	for idx := range sz {
 		fmt.Printf("sz%d = %f\n", idx+1, sz[idx])
 	}
+
+	fmt.Println(mat.Det(matrix))
+	my := sz[0]
+	for _, val := range sz[1:] {
+		my *= val
+	}
+	fmt.Println(my)
 }
