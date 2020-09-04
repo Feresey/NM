@@ -1,9 +1,12 @@
 package core
 
 import (
+	"math/cmplx"
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"gonum.org/v1/gonum/mat"
 )
 
 func TestQR(t *testing.T) {
@@ -73,10 +76,31 @@ func TestQR(t *testing.T) {
 			require.InDeltaSlice(t, tt.m.data, prod.data, eps)
 		})
 		t.Run(tt.name+"vals", func(t *testing.T) {
-			vals, iters, err := QRValues(tt.m, tt.eps)
+			vals, _, err := QRValues(tt.m, tt.eps)
 			require.NoError(t, err)
-			require.NotEmpty(t, vals)
-			require.NotZero(t, iters)
+
+			var eig mat.Eigen
+			ok := eig.Factorize(tt.m, mat.EigenLeft)
+			require.True(t, ok)
+
+			eigvals := eig.Values(nil)
+
+			require.Len(t, vals, len(eigvals))
+
+			sort.Sort(complexSlice(vals))
+			sort.Sort(complexSlice(eigvals))
+			for idx := range eigvals {
+				require.InDelta(t, cmplx.Abs(eigvals[idx]), cmplx.Abs(vals[idx]), 0.01,
+					"orig:\t%v\nmy:\t%v", eigvals, vals)
+			}
 		})
 	}
 }
+
+type complexSlice []complex128
+
+func (p complexSlice) Len() int { return len(p) }
+func (p complexSlice) Less(i, j int) bool {
+	return cmplx.Abs(p[i]) < cmplx.Abs(p[j]) || cmplx.IsNaN(p[i]) && !cmplx.IsNaN(p[j])
+}
+func (p complexSlice) Swap(i, j int) { p[i], p[j] = p[j], p[i] }

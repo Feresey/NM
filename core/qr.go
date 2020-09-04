@@ -77,20 +77,18 @@ func QRValues(A *Matrix, eps float64) ([]complex128, int, error) {
 	return res, iterations, nil
 }
 
-func finishComplex(A *Matrix, eps float64, i int) (bool, error) {
-	Q, R, err := QR(A)
-	if err != nil {
-		return false, err
-	}
-	Anext := R.ProdMatrix(Q)
-
-	l11, l12 := GetRoots(A, i)
-	l21, l22 := GetRoots(Anext, i)
-
-	return cmplx.Abs(l11-l21) <= eps && cmplx.Abs(l12-l22) <= eps, nil
+func inComplexEps(l1, l2 [2]complex128, eps float64) bool {
+	return cmplx.Abs(l1[0]-l2[0]) < eps &&
+		cmplx.Abs(l1[1]-l2[1]) < eps
 }
 
 func getEigenvalue(A *Matrix, eps float64, i int, iter *int) ([]complex128, error) {
+	var (
+		oldRoots [2]complex128
+		newRoots [2]complex128
+	)
+	oldRoots = GetRoots(A, i)
+
 	for {
 		Q, R, err := QR(A)
 		if err != nil {
@@ -98,8 +96,8 @@ func getEigenvalue(A *Matrix, eps float64, i int, iter *int) ([]complex128, erro
 		}
 		A = R.ProdMatrix(Q)
 
-		fmt.Printf("Q%d:\n%v\n", *iter, mat.Formatted(Q))
-		fmt.Printf("R%d:\n%v\n", *iter, mat.Formatted(R))
+		// fmt.Printf("Q%d:\n%v\n", *iter, mat.Formatted(Q))
+		// fmt.Printf("R%d:\n%v\n", *iter, mat.Formatted(R))
 		fmt.Printf("A%d:\n%v\n", *iter+1, mat.Formatted(A))
 		fmt.Println()
 
@@ -109,36 +107,33 @@ func getEigenvalue(A *Matrix, eps float64, i int, iter *int) ([]complex128, erro
 		for j := i + 1; j < A.n; j++ {
 			underlying[j-i-1] = A.At(j, i)
 		}
+
 		if norm(underlying) <= eps {
-			return []complex128{complex(A.At(i, i), 1)}, nil
+			return []complex128{complex(A.At(i, i), 0)}, nil
 		}
 		if norm(underlying[1:]) <= eps {
-			finished, err := finishComplex(A, eps, i)
-			if err != nil {
-				return nil, err
+			newRoots = GetRoots(A, i)
+			if inComplexEps(oldRoots, newRoots, eps) {
+				return newRoots[:], nil
 			}
-
-			if finished {
-				r1, r2 := GetRoots(A, i)
-				return []complex128{r1, r2}, nil
-			}
+			oldRoots = newRoots
 		}
 	}
 }
 
-func SolveQuadratic(a, b, c complex128) (xpos, xneg complex128) {
+func SolveQuadratic(a, b, c complex128) [2]complex128 {
 	negB := -b
 	twoA := 2 * a
 	bSquared := b * b
 	fourAC := 4 * a * c
 	discrim := bSquared - fourAC
 	sq := cmplx.Sqrt(discrim)
-	xpos = (negB + sq) / twoA
-	xneg = (negB - sq) / twoA
-	return
+	xpos := (negB + sq) / twoA
+	xneg := (negB - sq) / twoA
+	return [...]complex128{xpos, xneg}
 }
 
-func GetRoots(A *Matrix, i int) (pos, neg complex128) {
+func GetRoots(A *Matrix, i int) [2]complex128 {
 	var a11, a12, a21, a22 float64
 
 	lineMax := i + 1
