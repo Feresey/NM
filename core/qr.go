@@ -12,15 +12,14 @@ func sign(num float64) float64 {
 	}
 }
 
-func hausholder(col *Matrix) *Matrix {
-	res := EMatrix(col.n)
+func hausholder(v *Matrix) *Matrix {
+	vT := Transponse(v)
 
-	tr := Transponse(col)
-	top := col.ProdMatrix(tr)
-	bottom := tr.ProdMatrix(col)
+	top := v.ProdMatrix(vT)
+	bottom := vT.ProdMatrix(v)
+	top.ProdNum(2 / bottom.At(0, 0))
 
-	top.ProdNum(bottom.At(0, 0))
-	top.ProdNum(2)
+	res := EMatrix(v.n)
 	res.Sub(top)
 
 	return res
@@ -42,11 +41,15 @@ func QR(m *Matrix, eps float64) (*Matrix, *Matrix, error) {
 		}
 		diag := m.At(i, i)
 		vec.Set(i, 0, diag+sign(diag)*math.Sqrt(sum))
+
 		for j := i + 1; j < m.n; j++ {
-			vec.Set(j, 0, m.At(i, j))
+			vec.Set(j, 0, m.At(j, i))
 		}
 
+		// fmt.Println("vec: ", mat.Formatted(vec))
+
 		H := hausholder(vec)
+		// fmt.Println("hausholder: ", mat.Formatted(H))
 		R = H.ProdMatrix(R)
 		Q = Q.ProdMatrix(H)
 	}
