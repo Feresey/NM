@@ -39,7 +39,7 @@ func iterations(
 		// 	panic(prev)
 		// }
 
-		fmt.Printf("Iter: %d, value: %3.12f\n", iterations, curr)
+		fmt.Printf("Iter: %d, value: %3.15f\n", iterations, curr)
 		if finish(iterations, prev, curr) {
 			return curr, iterations
 		}
@@ -63,7 +63,7 @@ func main() {
 		},
 		*from, *to,
 	)
-	fmt.Printf("\nIterations method:\niterations: %d\nresult: %3.12f\n\n", iters, iterRes)
+	fmt.Printf("\nIterations method:\niterations: %d\nresult: %3.15f\n\n", iters, iterRes)
 
 	fmt.Printf("Newthon\nfrom: %f\nto: %f\n", *from, *to)
 	newthonRes, iters := iterations(
@@ -73,5 +73,9 @@ func main() {
 		},
 		*from, *to,
 	)
-	fmt.Printf("\nNewthon method:\niterations: %d\nresult: %3.12f\n\n", iters, newthonRes)
+	fmt.Printf("\nNewthon method:\niterations: %d\nresult: %3.15f\n\n", iters, newthonRes)
+
+	fmt.Printf("Iterations: %3.15f\n", f(iterRes))
+	fmt.Printf("Newthon: %3.15f\n", f(newthonRes))
+	fmt.Printf("diff: %3.15f\n", f(iterRes)-f(newthonRes))
 }
