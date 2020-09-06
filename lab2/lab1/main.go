@@ -52,7 +52,7 @@ func main() {
 	to := flag.Float64("to", 0.9, "right point")
 	q := flag.Float64("q", 0.4, "magick number, |phi'(x)| <= q < 1, Any x in (a,b)")
 	lambda := flag.Float64("lambda", -0.1, "second magick number")
-	eps := flag.Float64("eps", 1e-9, "calculation precision")
+	eps := flag.Float64("eps", 1e-9, "calculation accuracy")
 	flag.Parse()
 
 	fmt.Printf("Iterations\nfrom: %f\nto: %f\n", *from, *to)
