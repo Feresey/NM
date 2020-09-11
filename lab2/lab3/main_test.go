@@ -30,7 +30,7 @@ func TestLagrange(t *testing.T) {
 			points: makePoints([]float64{0.1, 0.5, 0.9, 1.3}, math.Log),
 			x:      0.8,
 			want:   math.Log(0.8),
-			delta:  0.025,
+			delta:  0.02278,
 		},
 		{
 			name: "sin",

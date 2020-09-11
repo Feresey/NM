@@ -25,7 +25,9 @@ func Lagrange(points points) func(float64) float64 {
 			W *= x - points.x[i]
 		}
 
+		// fmt.Printf("i\tx_i\t\tf_i\t\tw'(x_i)\t\tf_i/w'(x_i)\tX*-x_i\n")
 		for i := range w {
+			// fmt.Printf("%d\t%f\t%f\t%f\t%f\t%f\n", i, points.x[i], points.y[i], w[i], points.y[i]/w[i], x-points.x[i])
 			ww := points.y[i] * W / (x - points.x[i]) / w[i]
 			res += ww
 		}
