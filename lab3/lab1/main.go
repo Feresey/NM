@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math"
 	"strings"
+
+	"github.com/Arafatk/glot"
 )
 
 type points struct {
@@ -110,6 +112,40 @@ func solve(points points, x float64) {
 	fmt.Printf("newthon: %3.15f\n", interpolateNewthon(x))
 	fmt.Printf("lagrange: %3.15f\n", interpolateLagrange(x))
 	fmt.Printf("real: %3.15f\n", f(x))
+
+	plot, err := glot.NewPlot(2, true, false)
+	if err != nil {
+		panic(err)
+	}
+
+	more := make([]float64, len(points.x)*100)
+
+	var (
+		from float64 = points.x[0]
+		to   float64 = points.x[len(points.x)-1]
+	)
+	step := (to - from) / float64(len(more))
+
+	for idx := range more {
+		more[idx] = from
+		from += step
+	}
+
+	_ = plot.SetXrange(0, 2)
+	_ = plot.SetYrange(0, 3)
+
+	err = plot.AddFunc2d("original", "lines", more, f)
+	if err != nil {
+		panic(err)
+	}
+	err = plot.AddFunc2d("newthon", "lines", more, interpolateNewthon)
+	if err != nil {
+		panic(err)
+	}
+	err = plot.AddFunc2d("lagrange", "lines", more, interpolateLagrange)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func main() {
